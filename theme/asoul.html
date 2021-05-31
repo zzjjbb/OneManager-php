@@ -597,7 +597,15 @@
                 screenshot: true,
                 video: {
                     url: videos[i]
-                }
+                },
+                danmaku: {
+                    addition: [videos[i].replace(/[^/]*$/,"danmaku.json")]
+                },
+                // subtitle: {
+                //     url: '/A-SOUL_records/test/output.vtt',
+                //     type: 'webvtt',
+                //     fontSize: '25px',
+                // }
             });
         }
     }
