@@ -339,3 +339,8 @@ function setConfigResponse($response)
 {
     return json_decode( $response['body'], true );
 }
+
+function databaseConnect()
+{
+    return pg_connect(getenv("DATABASE_URL"));
+}

@@ -190,6 +190,13 @@ function main($path)
     } else {
         $_SERVER['admin']=0;
     }
+    // Added by zjb: USTC CAS Login
+    if (!$_SERVER['admin']) {
+        $login = login_ustc();
+        if (!is_null($login)) {
+            return $login;
+        }
+    }
     if (isset($_GET['setup']))
         if ($_SERVER['admin']) {
             // setup Environments. 设置，对环境变量操作
@@ -2706,4 +2713,57 @@ function render_list($path = '', $files = [])
     $html = $tmp[0] . '</title>' . $authinfo . $tmp[1];
     //if (isset($_SERVER['Set-Cookie'])) return output($html, $statusCode, [ 'Set-Cookie' => $_SERVER['Set-Cookie'], 'Content-Type' => 'text/html' ]);
     return output($html, $statusCode);
+}
+
+function login_ustc()
+{
+    if (isset($_COOKIE['USTCSESS'])) {
+        $ticket = $_COOKIE['USTCSESS'];
+        $conn = databaseConnect();
+        $query = pg_query_params($conn, 'select * from ustc where ticket=$1', [$ticket]);
+        if (!$query) {
+            // Extra possible case: invalid USTCSESS
+            return output('Illegal request! Debug info: ' . pg_last_error($conn), 403);
+        }
+        $name = pg_fetch_result($query, 0, 'user');
+        if ($name)
+            return null;
+    }
+
+    $ustc_redirect = 'service=' . urlencode('https://' . $_SERVER['HTTP_HOST'] . '?.ustc.edu.cn');
+    if (isset($_GET['ticket'])) {
+        $ustc_response = curl('GET', 'https://passport.ustc.edu.cn/serviceValidate?' . $ustc_redirect . '&ticket=' . $_GET['ticket'])['body'];
+        $ustc_xml = simplexml_load_string($ustc_response, null, null, 'http://www.yale.edu/tp/cas');
+        if (isset($ustc_xml->authenticationSuccess->user)) {
+            $user = strval($ustc_xml->authenticationSuccess->user);
+            $ticket = substr($_GET['ticket'], 3);
+            if (strlen($user) != 10) {
+                return output('Unable to process special user id' . $user);
+            }
+            if (!isset($conn) || !$conn) {
+                $conn = databaseConnect();
+            }
+            $query = pg_query_params($conn, 'select * from ustc where "user"=$1', [$user]);
+            if (!$query) {
+                return output('Database error 2 ' . pg_last_error($conn), 500);
+            }
+            $query = pg_query_params($conn,
+                pg_fetch_result($query, 0, 'user') ?
+                    'update ustc set ticket=$2,response=$3 where "user"=$1' :
+                    'insert into ustc values ($1,$2,$3)',
+                [$user, $ticket, $ustc_response]);
+            if (!$query) {
+                return output('Database error 3 ' . pg_last_error($conn), 500);
+            }
+            setcookie('USTCSESS', $ticket, null, '/', null, true);
+            setcookie('goto_page', '', time() - 1, '/');
+            return output('success by ticket, user: ' . $user . ", jump to previous page" . $_COOKIE['goto_page'],
+                302, ['Location' => $_COOKIE['goto_page'] ?? '/']);
+        } else {
+            return output('Login failed! Response from passport.ustc.edu.cn:<br>' . htmlspecialchars($ustc_response), 401);
+        }
+    } else {
+        setcookie("goto_page", $_SERVER['REQUEST_URI'], time() + 300, '/');
+        return output('Redirect to USTC login page', 302, ['Location' => 'https://passport.ustc.edu.cn/login?' . $ustc_redirect]);
+    }
 }
