@@ -73,6 +73,12 @@
             .list-table td, .list-table th{white-space:nowrap;overflow:auto;max-width:80px}
             .size, .updated_at{display:none}
         }
+        .dplayer-danmaku-right{animation-duration: 8s !important}
+        .dplayer-danmaku-item{
+            font-family: SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif !important;
+            font-weight: bold !important;
+            text-shadow: rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px !important;
+        }
     </style>
     <!--customCss-->
 </head>
@@ -558,6 +564,18 @@
         }
         document.getElementsByTagName('head')[0].appendChild(script);
     }
+    function loadCssCode(code){
+        let style = document.createElement('style');
+        style.rel = 'stylesheet';
+        try{
+            //for Chrome Firefox Opera Safari
+            style.appendChild(document.createTextNode(code));
+        }catch(ex){
+            //for IE
+            style.styleSheet.cssText = code;
+        }
+        document.getElementsByTagName('head')[0].appendChild(style);
+    }
     function addVideos(videos) {
         let host = 'https://s0.pstatp.com/cdn/expire-1-M';
         let unloadedResourceCount = 4;
@@ -590,6 +608,7 @@
         );
     }
     function createDplayers(videos) {
+        loadCssCode("")
         for (i = 0; i < videos.length; i++) {
             console.log(videos[i]);
             new DPlayer({
