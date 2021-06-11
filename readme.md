@@ -1,3 +1,18 @@
+改造为A-SOUL直播回放网站：https://a-soul.akarin.ml
+
+## Feature:
+- 多清晰度回放
+- 可加载直播弹幕
+
+## Todo:
+- 完善登录系统
+- 添加用户功能：评论区，回放弹幕，提交视频TAG，进度条信息……
+
+
+---
+
+以下为原项目README
+
 # NOTICE: the release is used as archive. 
 # 注意：release只是用来存档的。
 Please read the descriptions of settings before raising an issue. 请将设置中所有的设置项的说明都读一遍，有些问题就不用问了。  
