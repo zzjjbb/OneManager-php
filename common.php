@@ -1796,6 +1796,9 @@ function render_list($path = '', $files = [])
 <!--
     OneManager: An index & manager of Onedrive auth by ysun.
     Github: https://github.com/qkqpttgf/OneManager-php
+    
+    A-SOUL Live Records: modified by zzjjbb
+    Github: https://github.com/zzjjbb/OneManager-php
 -->';
     //$authinfo = $path . '<br><pre>' . json_encode($files, JSON_PRETTY_PRINT) . '</pre>';
 
@@ -1931,6 +1934,20 @@ function render_list($path = '', $files = [])
             }
             while (strpos($html, '<!--GuestStart-->')) $html = str_replace('<!--GuestStart-->', '', $html);
             while (strpos($html, '<!--GuestEnd-->')) $html = str_replace('<!--GuestEnd-->', '', $html);
+        }
+
+        if (isset($_SERVER['userinfo'])) {
+            while (strpos($html, '<!--UserStart-->')) $html = str_replace('<!--UserStart-->', '', $html);
+            while (strpos($html, '<!--UserEnd-->')) $html = str_replace('<!--UserEnd-->', '', $html);
+        }
+        else {
+            $tmp[1] = 'a';
+            while ($tmp[1]!='') {
+                $tmp = splitfirst($html, '<!--UserStart-->');
+                $html = $tmp[0];
+                $tmp = splitfirst($tmp[1], '<!--UserEnd-->');
+                $html .= $tmp[1];
+            }
         }
 
         if ($_SERVER['ishidden']==4) {
@@ -2717,6 +2734,9 @@ function render_list($path = '', $files = [])
 
 function login_ustc()
 {
+    if (isset($_GET['userLogout'])) {
+        return output('try to logout');
+    }
     if (isset($_COOKIE['USTCSESS'])) {
         $ticket = $_COOKIE['USTCSESS'];
         $conn = databaseConnect();
@@ -2725,8 +2745,9 @@ function login_ustc()
             // Extra possible case: invalid USTCSESS
             return output('Illegal request! Debug info: ' . pg_last_error($conn), 403);
         }
-        $name = pg_fetch_result($query, 0, 'user');
-        if ($name)
+        $userinfo = pg_fetch_row($query, 0);
+        if ($userinfo)
+            $_SERVER['userinfo'] = $userinfo;
             return null;
     }
 
@@ -2738,14 +2759,14 @@ function login_ustc()
             $user = strval($ustc_xml->authenticationSuccess->user);
             $ticket = substr($_GET['ticket'], 3);
             if (strlen($user) != 10) {
-                return output('Unable to process special user id' . $user);
+                return message('Unable to process special user id' . $user, 'Error', 403);
             }
             if (!isset($conn) || !$conn) {
                 $conn = databaseConnect();
             }
             $query = pg_query_params($conn, 'select * from ustc where "user"=$1', [$user]);
             if (!$query) {
-                return output('Database error 2 ' . pg_last_error($conn), 500);
+                return message('Database error 2 ' . pg_last_error($conn), 'Error', 500);
             }
             $query = pg_query_params($conn,
                 pg_fetch_result($query, 0, 'user') ?
@@ -2753,17 +2774,16 @@ function login_ustc()
                     'insert into ustc values ($1,$2,$3)',
                 [$user, $ticket, $ustc_response]);
             if (!$query) {
-                return output('Database error 3 ' . pg_last_error($conn), 500);
+                return message('Database error 3 ' . pg_last_error($conn), 'Error', 500);
             }
             setcookie('USTCSESS', $ticket, null, '/', null, true);
             setcookie('goto_page', '', time() - 1, '/');
-            return output('success by ticket, user: ' . $user . ", jump to previous page" . $_COOKIE['goto_page'],
-                302, ['Location' => $_COOKIE['goto_page'] ?? '/']);
+            return output('', 302, ['Location' => $_COOKIE['goto_page'] ?? '/']);
         } else {
-            return output('Login failed! Response from passport.ustc.edu.cn:<br>' . htmlspecialchars($ustc_response), 401);
+            return message('Response from passport.ustc.edu.cn:<br>' . htmlspecialchars($ustc_response), 'Login failed!', 401);
         }
     } else {
         setcookie("goto_page", $_SERVER['REQUEST_URI'], time() + 300, '/');
-        return output('Redirect to USTC login page', 302, ['Location' => 'https://passport.ustc.edu.cn/login?' . $ustc_redirect]);
+        return output('', 302, ['Location' => 'https://passport.ustc.edu.cn/login?' . $ustc_redirect]);
     }
 }

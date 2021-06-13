@@ -82,7 +82,12 @@
     </style>
 <!--UserStart-->
     <style>
-
+        .avatar {border-radius:50%;height:40px;width:40px;padding:0 10px}
+        .userinfo {position:relative;display:block;float:left}
+        .userinfo-content {display:none;position:absolute;box-shadow:0 2px 10px 0 rgba(0,0,0,.15);border-radius:8px;padding:7px 0;margin-left: 20px}
+        .userinfo-content a{display:flex;text-decoration: none;padding:8px 20px;color:#222;transition:0.3s ease}
+        .userinfo-content a:hover{background:#EEE;color:#00a1e6}
+        .userinfo:hover .userinfo-content {display: block}
     </style>
 <!--UserEnd-->
     <!--customCss-->
@@ -90,9 +95,18 @@
 
 <body>
     <div style="padding:1px" id="top-div">
-<!--LoginStart-->
-        <a class="login" onclick="login();"><ion-icon name="log-in"></ion-icon><!--constStr@Login--></a>
-<!--LoginEnd-->
+<!--UserStart-->
+        <div class="userinfo">
+            <div style="padding:10px;display:flex;height:40px">
+                <img class="avatar" src="https://i0.hdslb.com/bfs/face/48d65a10a2c643dddc4a51e0a60fae892393417a.jpg@40w_40h.jpg" referrerpolicy="no-referrer">
+                <span style="align-self: center;font-size:16px">PB20000000</span>
+            </div>
+            <div class="userinfo-content">
+                <a href="/">帐号设置</a>
+                <a href="/?userLogout">退出登录</a>
+            </div>
+        </div>
+<!--UserEnd-->
 <!--AdminStart-->
         <li class="operate"><ion-icon name="construct"></ion-icon><!--constStr@Operate--><ul>
 <!--IsFolderStart-->
