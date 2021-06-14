@@ -1939,6 +1939,8 @@ function render_list($path = '', $files = [])
         if (isset($_SERVER['userinfo'])) {
             while (strpos($html, '<!--UserStart-->')) $html = str_replace('<!--UserStart-->', '', $html);
             while (strpos($html, '<!--UserEnd-->')) $html = str_replace('<!--UserEnd-->', '', $html);
+            while (strpos($html, '<!--UserInfo@name-->')) $html = str_replace('<!--UserInfo@name-->', htmlspecialchars($_SERVER['userinfo'][3]?:$_SERVER['userinfo'][0]), $html);
+            while (strpos($html, '<!--UserInfo@avatar-->')) $html = str_replace('<!--UserInfo@avatar-->', $_SERVER['userinfo'][4]??'i1.hdslb.com/bfs/face/3c6deaa829bb63363435f160451975e03cfdc52f.jpg', $html);
         }
         else {
             $tmp[1] = 'a';
@@ -2743,12 +2745,14 @@ function login_ustc()
         $query = pg_query_params($conn, 'select * from ustc where ticket=$1', [$ticket]);
         if (!$query) {
             // Extra possible case: invalid USTCSESS
-            return output('Illegal request! Debug info: ' . pg_last_error($conn), 403);
+            setcookie('USTCSESS', '', time() - 1, '/', null, true);
+            return message('Debug info: ' . database_debug($conn), 'Illegal request!', 403);
         }
         $userinfo = pg_fetch_row($query, 0);
-        if ($userinfo)
+        if ($userinfo) {
             $_SERVER['userinfo'] = $userinfo;
             return null;
+        }
     }
 
     $ustc_redirect = 'service=' . urlencode('https://' . $_SERVER['HTTP_HOST'] . '?.ustc.edu.cn');
@@ -2766,7 +2770,7 @@ function login_ustc()
             }
             $query = pg_query_params($conn, 'select * from ustc where "user"=$1', [$user]);
             if (!$query) {
-                return message('Database error 2 ' . pg_last_error($conn), 'Error', 500);
+                return message('Database error 2 ' . database_debug($conn), 'Error', 500);
             }
             $query = pg_query_params($conn,
                 pg_fetch_result($query, 0, 'user') ?
@@ -2774,9 +2778,9 @@ function login_ustc()
                     'insert into ustc values ($1,$2,$3)',
                 [$user, $ticket, $ustc_response]);
             if (!$query) {
-                return message('Database error 3 ' . pg_last_error($conn), 'Error', 500);
+                return message('Database error 3 ' . database_debug($conn), 'Error', 500);
             }
-            setcookie('USTCSESS', $ticket, null, '/', null, true);
+            setcookie('USTCSESS', $ticket, time() + 7 * 86400, '/', null, true);
             setcookie('goto_page', '', time() - 1, '/');
             return output('', 302, ['Location' => $_COOKIE['goto_page'] ?? '/']);
         } else {
@@ -2785,5 +2789,14 @@ function login_ustc()
     } else {
         setcookie("goto_page", $_SERVER['REQUEST_URI'], time() + 300, '/');
         return output('', 302, ['Location' => 'https://passport.ustc.edu.cn/login?' . $ustc_redirect]);
+    }
+}
+
+function database_debug($conn)
+{
+    if ( isset($_COOKIE['admin_debug'])&&compareadminmd5($_COOKIE['admin_debug'], 'admin', getConfig('admin')) ) {
+        return pg_last_error($conn);
+    } else {
+        return 'ERROR LOG IS HIDDEN';
     }
 }
