@@ -1941,6 +1941,7 @@ function render_list($path = '', $files = [])
             while (strpos($html, '<!--UserEnd-->')) $html = str_replace('<!--UserEnd-->', '', $html);
             while (strpos($html, '<!--UserInfo@name-->')) $html = str_replace('<!--UserInfo@name-->', htmlspecialchars($_SERVER['userinfo'][3]?:$_SERVER['userinfo'][0]), $html);
             while (strpos($html, '<!--UserInfo@avatar-->')) $html = str_replace('<!--UserInfo@avatar-->', $_SERVER['userinfo'][4]??'i1.hdslb.com/bfs/face/3c6deaa829bb63363435f160451975e03cfdc52f.jpg', $html);
+            while (strpos($html, '<!--UserInfo@extra-->')) $html = str_replace('<!--UserInfo@extra-->', htmlspecialchars($_SERVER['userinfo'][5]??''), $html);
         }
         else {
             $tmp[1] = 'a';
@@ -2751,15 +2752,13 @@ function login_ustc()
         $userinfo = pg_fetch_row($query, 0);
         if ($userinfo) {
             $_SERVER['userinfo'] = $userinfo;
-            if (isset($_POST['setinfo_nickname'])){
-                if (strlen($_POST['setinfo_avatar'])==9) {
-                    return message('error test', null, 403);
-                }
-                return message('nickname:'. $_POST['setinfo_nickname'].'<br>B uid:'.$_POST['setinfo_avatar'].'<br>extra:'.$_POST['setinfo_extra']);
-            }
+            if (isset($_POST['setinfo_nickname']))
+                return update_ustc($conn, $userinfo[0]);
             return null;
         }
     }
+    if (isset($_POST['setinfo_nickname']))
+        return output("user unauthorized",401);
 
     $ustc_redirect = 'service=' . urlencode('https://' . $_SERVER['HTTP_HOST'] . '?.ustc.edu.cn');
     if (isset($_GET['ticket'])) {
@@ -2805,4 +2804,39 @@ function database_debug($conn)
     } else {
         return 'ERROR LOG IS HIDDEN';
     }
+}
+
+function update_ustc($conn, $user_id)
+{
+    $user_nickname=$_POST['setinfo_nickname'];
+    $user_avatar_uid=$_POST['setinfo_avatar']??'';
+    $user_extra=$_POST['setinfo_extra']??'';
+    $modified = ['uid'=>$user_id,'nickname'=>$user_nickname,'extra'=>$user_extra];
+
+    if ($user_nickname==''){
+        return output('E1, POST: '.json_encode($_POST), 403);
+    }
+    if ($user_avatar_uid==''){
+        $query = pg_query_params($conn, 'update ustc set nickname=$2,extra=$3 where "user"=$1',
+            [$user_id, $user_nickname, $user_extra]);
+        if (!$query)
+            return output('E2, db info: ' . database_debug($conn).'<br>POST: '.json_encode($_POST), 500);
+    }
+    elseif (preg_match('/^\d+$/',$user_avatar_uid)) {
+        $bili_response = curl('GET', 'https://api.bilibili.com/x/space/acc/info?mid=' . $user_avatar_uid)['body'];
+        if (preg_match('/^https?:\/\/(i[012]\.hdslb\.com\/.*)$/',json_decode($bili_response)->data->face??'',$matches)){
+            $user_avatar=$matches[1];
+            $query = pg_query_params($conn, 'update ustc set nickname=$2,avatar=$4,extra=$3 where "user"=$1',
+                [$user_id, $user_nickname, $user_extra, $user_avatar]);
+            if (!$query)
+                return output('E3, db info: ' . database_debug($conn).'<br>POST: '.json_encode($_POST).'<br>bilibili response'.$bili_response, 500);
+            $modified['avatar'] = $user_avatar;
+        }
+        else
+            return output('E4, bili: '.$bili_response, 500);
+    }
+    else{
+        return output('E5, POST: '.json_encode($_POST), 403);
+    }
+    return output('SUCC, userinfo'.json_encode($modified));
 }

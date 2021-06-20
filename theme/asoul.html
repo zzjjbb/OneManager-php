@@ -376,20 +376,20 @@
         <form id="setinfo_form" onsubmit="submit_user_operate('setinfo');return false">
             <table>
                 <tr>
-                    <td style="width:12rem">昵称：</td>
+                    <td style="width:10rem">昵称：</td>
                     <td><input id="setinfo_input" name="setinfo_nickname" type="text" value="<!--UserInfo@name-->"></td>
                 </tr>
                 <tr>
-                    <td>头像 (Bilibili UID)：</td>
+                    <td>头像 (B站UID)：</td>
                     <td><input id="setinfo_avatar" name="setinfo_avatar" type="text" value="" placeholder="留空保持不变"></td>
                 </tr>
                 <tr>
-                    <td>其他信息 (比如可以填写身份证号和家庭住址，说说嘛🤗没事的)：</td>
-                    <td><textarea id="setinfo_extra" name="setinfo_extra" rows="4" cols="20"></textarea></td>
+                    <td style="line-height:1.5">备注信息 (比如可以填写身份证号和家庭住址，说说嘛🤗没事的)：</td>
+                    <td><textarea id="setinfo_extra" name="setinfo_extra" rows="4" cols="20"><!--UserInfo@extra--></textarea></td>
                 </tr>
                 <tr>
                     <td style="height:1.5rem">
-                        <div id="setinfo_status"><img src="/res/img/ico/loading.svg" style="display:none"></div>
+                        <div id="setinfo_status"><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align:middle;opacity:0"></div>
                     </td>
                     <td/>
                 </tr>
@@ -435,10 +435,10 @@
     }
 
     function submit_user_operate(str) {
-        const loading_html = '<font color="#aaa">提交中</font><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align: middle">'
-        const serr_html = '<font color="#f44">提交失败！</font>'
+        const loading_html = '<span style="color:#aaa">提交中</span><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align: middle">'
+        const serr_html = '<span style="color:#f44">提交失败！</span>'
         if (str === 'setinfo' && !/^\d*$/.test(document.getElementById(str + '_avatar').value)) {
-            document.getElementById(str + '_status').innerHTML = '<font color="#f44">bilibili UID格式错误！</font>'
+            document.getElementById(str + '_status').innerHTML = '<span style="color:#f44">请填写纯数字bilibili UID</span>'
             return
         }
         document.getElementById(str + '_submit').disabled = true;
@@ -453,7 +453,7 @@
             },
             method: 'POST',
         }).then(response => response.text().then(text => {
-            if (response.ok) return [response.status, text];
+            if (response.ok && text.substr(0,4)==='SUCC') return [response.status, text];
             throw [response.status, text];
         })).then(t => {
             console.log(t.join(' '));
@@ -461,6 +461,7 @@
             document.getElementById(str + '_submit').disabled = false;
             document.getElementById(str + '_div').style.display = 'none';
             document.getElementById('mask').style.display = 'none';
+            if (str === 'setinfo') location.reload();
         }).catch(e => {
             document.getElementById(str + '_status').innerHTML = serr_html;
             if (e instanceof Array) {
