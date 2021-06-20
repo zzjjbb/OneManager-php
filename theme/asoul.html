@@ -58,9 +58,17 @@
         .operate ul li{padding:7px;list-style:none;display:block;}
         .list-table tr[data-to]:hover .operate ul li a{color:black}
 <!--AdminEnd-->
-        .operatediv{position:absolute;border:1px #CCCCCC;background-color:#FFFFCC;z-index:2;}
-        .operatediv div{margin:16px}
-        .operatediv_close{position:absolute;right:3px;top:3px;}
+        .operatediv{position:absolute;border:1px #CCCCCC;background-color:#F9F9F7;z-index:2;padding:24px}
+        .operatediv form {margin: 0}
+        .operatediv textarea {resize: none}
+        .operatediv input[type=text],.operatediv textarea {width:100%;padding:8px 8px;margin:8px 0;display:inline-block;border:1px solid #ccc;border-radius: 4px;box-sizing:border-box;}
+        .buttonsdiv {display:flex;justify-content:space-between;padding:0 48px}
+        .buttonsdiv input[type=submit],.buttonsdiv button{width: 40%;padding: 12px 12px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;transition: 0.2s ease}
+        .buttonsdiv input[type=submit]{background-color: #438be9;color: white}
+        .buttonsdiv input[type=submit]:hover{background-color: #5e9dfb}
+        .buttonsdiv button{background-color: #dfdfdf;color: #222}
+        .buttonsdiv button:hover{background-color: #d3d3d3}
+        .operatediv_close{position:absolute;right:6px;top:6px;width:16px;cursor:pointer}
         .readme{padding:8px;}
         .markdown-body, .customfile{padding:20px;text-align:left}
         @media only screen and (max-width:480px){
@@ -83,11 +91,12 @@
 <!--UserStart-->
     <style>
         .avatar {border-radius:50%;height:40px;min-width:40px;padding:0 10px}
-        .userinfo {position:relative;display:block;float:left}
-        .userinfo-content {display:none;position:absolute;box-shadow:0 2px 10px 0 rgba(0,0,0,.15);border-radius:8px;padding:7px 0;margin-left: 20px}
-        .userinfo-content a{display:flex;text-decoration: none;padding:8px 20px;color:#222;transition:0.3s ease}
+        .userinfo {position:absolute;display:block;float:left}
+        .userinfo-content {display:none;position:absolute;padding:7px 0;margin-left: 20px;z-index:1}
+        .userinfo-content a{display:flex;text-decoration: none;padding:8px 20px;background:#f7f7f9;color:#222;transition:0.3s ease}
         .userinfo-content a:hover{background:#EEE;color:#00a1e6}
         .userinfo:hover .userinfo-content {display: block}
+        .floating-card {box-shadow: 0 2px 10px 0 rgba(0,0,0,.15);border-radius: 8px}
     </style>
 <!--UserEnd-->
     <!--customCss-->
@@ -101,8 +110,9 @@
                 <img class="avatar" src="//<!--UserInfo@avatar-->@120w_120h.jpg" referrerpolicy="no-referrer">
                 <span style="align-self: center;font-size:16px"><!--UserInfo@name--></span>
             </div>
-            <div class="userinfo-content">
-                <a href="/">帐号设置</a>
+            <div class="userinfo-content floating-card">
+                <a onclick="showCenter('setinfo')">帐号设置</a>
+                <a href="https://github.com/zzjjbb/OneManager-php/issues/new" target="_blank">建议反馈</a>
                 <a href="/?userLogout">退出登录</a>
             </div>
         </div>
@@ -360,6 +370,38 @@
         </div>
     </div>
 <!--LoginEnd-->
+<!--UserStart-->
+    <div id="setinfo_div" class="operatediv floating-card" style="display:none">
+        <a onclick="operatediv_close('setinfo')" class="operatediv_close"><svg t="1536830466687" viewBox="0 0 1024 1024" version="1.1"><title>关闭</title><path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="15859"></path></svg></a>
+        <form id="setinfo_form" onsubmit="submit_user_operate('setinfo');return false">
+            <table>
+                <tr>
+                    <td style="width:12rem">昵称：</td>
+                    <td><input id="setinfo_input" name="setinfo_nickname" type="text" value="<!--UserInfo@name-->"></td>
+                </tr>
+                <tr>
+                    <td>头像 (Bilibili UID)：</td>
+                    <td><input id="setinfo_avatar" name="setinfo_avatar" type="text" value="" placeholder="留空保持不变"></td>
+                </tr>
+                <tr>
+                    <td>其他信息 (比如可以填写身份证号和家庭住址，说说嘛🤗没事的)：</td>
+                    <td><textarea id="setinfo_extra" name="setinfo_extra" rows="4" cols="20"></textarea></td>
+                </tr>
+                <tr>
+                    <td style="height:1.5rem">
+                        <div id="setinfo_status"><img src="/res/img/ico/loading.svg" style="display:none"></div>
+                    </td>
+                    <td/>
+                </tr>
+            </table>
+            <div class="buttonsdiv">
+                <input name="operate_action" id="setinfo_submit" type="submit" value="确定">
+                <button type="button" onclick="operatediv_close('setinfo')">取消</button>
+            </div>
+        </form>
+    </div>
+<!--UserEnd-->
+
     <div style="color: rgba(247,247,249,0);"><!--FootStr--></div>
 </body>
 
@@ -380,6 +422,118 @@
         document.cookie='language='+str+'; path=/; '+expires;
         location.href = location.href;
     }
+<!--UserStart-->
+    function showCenter(action) {
+        document.getElementById('mask').style.display = '';
+        document.getElementById('mask').style.height = document.documentElement.scrollHeight < window.innerHeight ? window.innerHeight : document.documentElement.scrollHeight + 'px';
+        document.getElementById(action + '_div').style.display = '';
+        var $scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+        var $scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+        document.getElementById(action + '_div').style.left = (document.body.clientWidth - document.getElementById(action + '_div').offsetWidth) / 2 + 'px';
+        document.getElementById(action + '_div').style.top = (window.innerHeight - document.getElementById(action + '_div').offsetHeight) / 2 + $scrollY + 'px';
+        document.getElementById(action + '_input').focus();
+    }
+
+    function submit_user_operate(str) {
+        const loading_html = '<font color="#aaa">提交中</font><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align: middle">'
+        const serr_html = '<font color="#f44">提交失败！</font>'
+        if (str === 'setinfo' && !/^\d*$/.test(document.getElementById(str + '_avatar').value)) {
+            document.getElementById(str + '_status').innerHTML = '<font color="#f44">bilibili UID格式错误！</font>'
+            return
+        }
+        document.getElementById(str + '_submit').disabled = true;
+        document.getElementById(str + '_status').innerHTML = loading_html;
+        fetch('/', {
+            body: serializeForm(str + '_form'),
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+                'x-requested-with': 'XMLHttpRequest'
+            },
+            method: 'POST',
+        }).then(response => response.text().then(text => {
+            if (response.ok) return [response.status, text];
+            throw [response.status, text];
+        })).then(t => {
+            console.log(t.join(' '));
+            document.getElementById(str + '_status').innerHTML = '';
+            document.getElementById(str + '_submit').disabled = false;
+            document.getElementById(str + '_div').style.display = 'none';
+            document.getElementById('mask').style.display = 'none';
+        }).catch(e => {
+            document.getElementById(str + '_status').innerHTML = serr_html;
+            if (e instanceof Array) {
+                console.error(e.join(' '));
+            } else throw e;
+        }).finally(() => document.getElementById(str + '_submit').disabled = false)
+    }
+
+    function serializeElement(element) {
+        var method = element.tagName.toLowerCase();
+        var parameter;
+        if (method == 'select') {
+            parameter = [element.name, element.value];
+        }
+        switch (element.type.toLowerCase()) {
+            case 'submit':
+            case 'hidden':
+            case 'password':
+            case 'text':
+            case 'date':
+            case 'textarea':
+                parameter = [element.name, element.value];
+                break;
+            case 'checkbox':
+            case 'radio':
+                if (element.checked) {
+                    parameter = [element.name, element.value];
+                }
+                break;
+        }
+        if (parameter) {
+            var key = encodeURIComponent(parameter[0]);
+            if (key.length == 0) return;
+            if (parameter[1].constructor != Array) parameter[1] = [parameter[1]];
+            var values = parameter[1];
+            var results = [];
+            for (var i = 0; i < values.length; i++) {
+                results.push(key + '=' + encodeURIComponent(values[i]));
+            }
+            return results.join('&');
+        }
+    }
+
+    function getElements(formId) {
+        var form = document.getElementById(formId);
+        var elements = new Array();
+        var tagElements = form.getElementsByTagName('input');
+        for (var j = 0; j < tagElements.length; j++) {
+            elements.push(tagElements[j]);
+        }
+        var tagElements = form.getElementsByTagName('select');
+        for (var j = 0; j < tagElements.length; j++) {
+            elements.push(tagElements[j]);
+        }
+        var tagElements = form.getElementsByTagName('textarea');
+        for (var j = 0; j < tagElements.length; j++) {
+            elements.push(tagElements[j]);
+        }
+        return elements;
+    }
+
+    function serializeForm(formId) {
+        var elements = getElements(formId);
+        var queryComponents = new Array();
+        for (var i = 0; i < elements.length; i++) {
+            var queryComponent = serializeElement(elements[i]);
+            if (queryComponent) {
+                queryComponents.push(queryComponent);
+            }
+        }
+        return queryComponents.join('&');
+    }
+<!--UserEnd-->
 <!--LoginStart-->
     function login() {
         document.getElementById('mask').style.display='';

@@ -1532,7 +1532,7 @@ function EnvOpt($needUpdate = 0)
         } else {
             $frame .= '
 <form name="updateform" action="" method="post">
-    <input type="text" name="auth" size="6" placeholder="auth" value="qkqpttgf">
+    <input type="text" name="auth" size="6" placeholder="auth" value="zzjjbb">
     <input type="text" name="project" size="12" placeholder="project" value="OneManager-php">
     <button name="QueryBranchs" onclick="querybranchs();return false;">' . getconstStr('QueryBranchs') . '</button>
     <select name="branch">
@@ -2751,6 +2751,12 @@ function login_ustc()
         $userinfo = pg_fetch_row($query, 0);
         if ($userinfo) {
             $_SERVER['userinfo'] = $userinfo;
+            if (isset($_POST['setinfo_nickname'])){
+                if (strlen($_POST['setinfo_avatar'])==9) {
+                    return message('error test', null, 403);
+                }
+                return message('nickname:'. $_POST['setinfo_nickname'].'<br>B uid:'.$_POST['setinfo_avatar'].'<br>extra:'.$_POST['setinfo_extra']);
+            }
             return null;
         }
     }
