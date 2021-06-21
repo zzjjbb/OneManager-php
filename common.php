@@ -2796,10 +2796,10 @@ function login_ustc()
             if (!$query) {
                 return message('Database error 2 ' . database_debug($conn), 'Error', 500);
             }
+            $userinfo = pg_fetch_row($query, 0);
+            if ($userinfo && $userinfo[1]) $ticket = $userinfo[1];
             $query = pg_query_params($conn,
-                pg_fetch_result($query, 0, 'user') ?
-                    'update ustc set ticket=$2,response=$3 where "user"=$1' :
-                    'insert into ustc values ($1,$2,$3)',
+                $userinfo ? 'update ustc set ticket=$2,response=$3 where "user"=$1' : 'insert into ustc values ($1,$2,$3)',
                 [$user, $ticket, $ustc_response]);
             if (!$query) {
                 return message('Database error 3 ' . database_debug($conn), 'Error', 500);
