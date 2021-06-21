@@ -24,6 +24,7 @@ $EnvConfigs = [
     'autoJumpFirstDisk' => 0b010,
     'background'        => 0b011,
     'backgroundm'       => 0b011,
+    'staticres'         => 0b011,
     'disableShowThumb'  => 0b010,
     //'disableChangeTheme'=> 0b010,
     'disktag'           => 0b000,
@@ -2701,6 +2702,7 @@ function render_list($path = '', $files = [])
             } else $str = substr($str, 0, -1).']';
             $html = str_replace('{{.RawData}}', base64_encode($str), $html);
         }
+        while (strpos($html, '<!--StaticResUrl-->')) $html = str_replace('<!--StaticResUrl-->', getConfig('staticres')?:'', $html);
 
         // 最后清除换行
         while (strpos($html, "\r\n\r\n")) $html = str_replace("\r\n\r\n", "\r\n", $html);

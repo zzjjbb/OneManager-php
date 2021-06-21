@@ -21,10 +21,10 @@
     <meta name=viewport content="width=device-width,initial-scale=1">
     <meta name="keywords" content="<!--Keywords-->">
     <meta name="description" content="<!--Description-->">
-    <link rel="icon" href="<!--base_path-->favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="<!--base_path-->favicon.ico" type="image/x-icon">
+    <link rel="icon" href="<!--StaticResUrl-->/img/ico/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="<!--StaticResUrl-->/img/ico/favicon.ico" type="image/x-icon">
     <style type="text/css">
-        body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1em;color:#000;background-color:#f7f7f9;<!--BackgroundStart-->background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--BackgroundUrl-->");<!--BackgroundEnd-->}
+        body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1em;color:#000;background-color:#f7f7f9;<!--BackgroundStart-->background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--StaticResUrl--><!--BackgroundUrl-->");<!--BackgroundEnd-->}
         a{color:#24292e;cursor:pointer;text-decoration:none}
         ion-icon{font-size:15px;vertical-align:bottom}
         .changelanguage{display:none;position:absolute;right:5px;}
@@ -73,7 +73,7 @@
         .markdown-body, .customfile{padding:20px;text-align:left}
         @media only screen and (max-width:480px){
 <!--BackgroundMStart-->
-            body{background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--BackgroundMUrl-->");}
+            body{background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--StaticResUrl--><!--BackgroundMUrl-->");}
 <!--BackgroundMEnd-->
             .title{margin-bottom:24px}
             .list-wrapper{width:95%; margin-bottom:24px;}
@@ -91,7 +91,7 @@
 <!--UserStart-->
     <style>
         .avatar {border-radius:50%;height:40px;min-width:40px;padding:0 10px}
-        .userinfo {position:absolute;display:block;float:left}
+        .userinfo {display:inline-block}
         .userinfo-content {display:none;position:absolute;padding:7px 0;margin-left:20px;z-index:1;background:#f7f7f9;white-space:nowrap}
         .userinfo-content a{display:flex;text-decoration:none;padding:8px 20px;color:#222;transition:0.3s ease}
         .userinfo-content a:hover{background:#EEE;color:#00a1e6}
@@ -392,7 +392,7 @@
                 </tr>
                 <tr>
                     <td style="height:1.5rem">
-                        <div id="setinfo_status"><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align:middle;opacity:0"></div>
+                        <div id="setinfo_status"><img src="<!--StaticResUrl-->/img/ico/loading.svg" style="height:1rem;vertical-align:middle;opacity:0"></div>
                     </td>
                     <td/>
                 </tr>
@@ -438,7 +438,7 @@
     }
 
     function submit_user_operate(str) {
-        const loading_html = '<span style="color:#aaa">提交中</span><img src="/res/img/ico/loading.svg" style="height:1rem;vertical-align: middle">'
+        const loading_html = '<span style="color:#aaa">提交中</span><img src="<!--StaticResUrl-->/img/ico/loading.svg" style="height:1rem;vertical-align: middle">'
         const serr_html = '<span style="color:#f44">提交失败！</span>'
         if (str === 'setinfo' && !/^\d*$/.test(document.getElementById(str + '_avatar').value)) {
             document.getElementById(str + '_status').innerHTML = '<span style="color:#f44">请填写纯数字bilibili UID</span>'

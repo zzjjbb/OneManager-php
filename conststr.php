@@ -141,6 +141,7 @@ $constStr = [
             'domainforproxy' => '会将https://xxxxx-my.sharepoint.com替换成这个值，在目标需要自己设置反代。会加上&Origindomain=原域名',
             'public_path' => '使用API长链接访问时，显示网盘文件的路径，不设置时默认为根目录。',
             'sitename' => '网站的名称',
+            'staticres' => '静态资源CDN前缀',
         ],
         'zh-tw' => [
             'admin' => '管理密碼，不設定密碼將不顯示登入頁面且無法登入。',
