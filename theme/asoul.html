@@ -92,8 +92,8 @@
     <style>
         .avatar {border-radius:50%;height:40px;min-width:40px;padding:0 10px}
         .userinfo {position:absolute;display:block;float:left}
-        .userinfo-content {display:none;position:absolute;padding:7px 0;margin-left: 20px;z-index:1}
-        .userinfo-content a{display:flex;text-decoration: none;padding:8px 20px;background:#f7f7f9;color:#222;transition:0.3s ease}
+        .userinfo-content {display:none;position:absolute;padding:7px 0;margin-left:20px;z-index:1;background:#f7f7f9;white-space:nowrap}
+        .userinfo-content a{display:flex;text-decoration:none;padding:8px 20px;color:#222;transition:0.3s ease}
         .userinfo-content a:hover{background:#EEE;color:#00a1e6}
         .userinfo:hover .userinfo-content {display: block}
         .floating-card {box-shadow: 0 2px 10px 0 rgba(0,0,0,.15);border-radius: 8px}
@@ -224,6 +224,9 @@
 <!--IsvideoFileStart-->
                         <div id="video-a0"></div>
 <!--IsvideoFileEnd-->
+<!--IsplayerFileStart-->
+                        <div style="text-align:initial"><div id="video-a"></div></div>
+<!--IsplayerFileEnd-->
 <!--IsmusicFileStart-->
                         <audio src="<!--FileDownUrl-->" controls="controls" style="width: 100%"></audio>
 <!--IsmusicFileEnd-->
@@ -579,7 +582,7 @@
         $textarea.style.height = $textarea.scrollHeight + 'px';
     }
 <!--IstxtFileEnd-->
-<!--IsvideoFileStart-->
+<!--VideoLibStart-->
     function loadResources(type, src, callback) {
         let script = document.createElement(type);
         let loaded = false;
@@ -599,18 +602,6 @@
             script.src = src;
         }
         document.getElementsByTagName('head')[0].appendChild(script);
-    }
-    function loadCssCode(code){
-        let style = document.createElement('style');
-        style.rel = 'stylesheet';
-        try{
-            //for Chrome Firefox Opera Safari
-            style.appendChild(document.createTextNode(code));
-        }catch(ex){
-            //for IE
-            style.styleSheet.cssText = code;
-        }
-        document.getElementsByTagName('head')[0].appendChild(style);
     }
     function addVideos(videos) {
         let host = 'https://s0.pstatp.com/cdn/expire-1-M';
@@ -643,8 +634,26 @@
             callback
         );
     }
+<!--VideoLibEnd-->
+<!--IsplayerFileStart-->
+    function createDplayers(video_info) {
+        console.log(video_info);
+        video_info.video.defaultQuality = 0;
+        video_info.container = document.getElementById('video-a');
+        video_info.screenshot = true
+        new DPlayer(video_info);
+    }
+    fetch(decodeURIComponent('<!--FileEncodeDownUrl-->'))
+        .then(response => response.json())
+        .then(addVideos);
+    console.log('<!--FileUrl-->');
+    console.log('<!--FileEncodeUrl-->');
+    console.log('<!--FileDownUrl-->')
+    console.log('<!--FileEncodeDownUrl-->')
+    console.log('<!--FileEncodeReplaceUrl-->');
+<!--IsplayerFileEnd-->
+<!--IsvideoFileStart-->
     function createDplayers(videos) {
-        loadCssCode("")
         for (i = 0; i < videos.length; i++) {
             console.log(videos[i]);
             new DPlayer({
@@ -656,11 +665,6 @@
                 danmaku: {
                     addition: [videos[i].replace(/[^/]*$/,"danmaku.json")]
                 },
-                // subtitle: {
-                //     url: '/A-SOUL_records/test/output.vtt',
-                //     type: 'webvtt',
-                //     fontSize: '25px',
-                // }
             });
         }
     }
@@ -879,7 +883,8 @@
     document.getElementById('password1').focus();
 <!--EncryptedEnd-->
 </script>
-<script src="//unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+<script type="module" src="https://unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule="" src="https://unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
 <!--LoginStart--><script src="https://cdn.bootcss.com/js-sha1/0.6.0/sha1.min.js"></script><!--LoginEnd-->
 <!--customScript-->
 </html>

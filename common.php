@@ -2155,8 +2155,9 @@ function render_list($path = '', $files = [])
             elseif ($ext=='pdf') $ext = 'pdf';
             elseif (in_array($ext, $exts['office'])) $ext = 'office';
             elseif (in_array($ext, $exts['txt'])) $ext = 'txt';
+            elseif (strtolower(substr($path, strrpos($path, '/') + 1))=='play') $ext = 'player';
             else $ext = 'Other';
-            $previewext = ['img', 'video', 'music', 'pdf', 'office', 'txt', 'Other'];
+            $previewext = ['img', 'video', 'music', 'pdf', 'office', 'txt', 'player', 'Other'];
             $previewext = array_diff($previewext, [ $ext ]);
             foreach ($previewext as $ext1) {
                 $tmp[1] = 'a';
@@ -2170,6 +2171,19 @@ function render_list($path = '', $files = [])
             while (strpos($html, '<!--Is'.$ext.'FileStart-->')) {
                 $html = str_replace('<!--Is'.$ext.'FileStart-->', '', $html);
                 $html = str_replace('<!--Is'.$ext.'FileEnd-->', '', $html);
+            }
+            if (in_array($ext, ['video', 'player'])) {
+                $html = str_replace('<!--VideoLibStart-->', '', $html);
+                $html = str_replace('<!--VideoLibEnd-->', '', $html);
+            }
+            else {
+                $tmp[1] = 'a';
+                while ($tmp[1]!='') {
+                    $tmp = splitfirst($html, '<!--VideoLibStart-->');
+                    $html = $tmp[0];
+                    $tmp = splitfirst($tmp[1], '<!--VideoLibEnd-->');
+                    $html .= $tmp[1];
+                }
             }
             //while (strpos($html, '<!--FileDownUrl-->')) $html = str_replace('<!--FileDownUrl-->', $files['url'], $html);
             while (strpos($html, '<!--FileDownUrl-->')) $html = str_replace('<!--FileDownUrl-->', encode_str_replace(path_format($_SERVER['base_disk_path'] . '/' . $path)), $html);
