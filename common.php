@@ -198,6 +198,9 @@ function main($path)
             return $login;
         }
     }
+    if (isset($_GET['id']) && $_GET['id'] == 'undefined') {
+        return output('{"code":0,"data":[]}', 200, ['Content-Type' => 'application/json']);
+    }
     if (isset($_GET['setup']))
         if ($_SERVER['admin']) {
             // setup Environments. 设置，对环境变量操作
@@ -2185,6 +2188,9 @@ function render_list($path = '', $files = [])
                     $tmp = splitfirst($tmp[1], '<!--VideoLibEnd-->');
                     $html .= $tmp[1];
                 }
+            }
+            if ($ext == 'player') {
+                $pretitle = $p_path;
             }
             //while (strpos($html, '<!--FileDownUrl-->')) $html = str_replace('<!--FileDownUrl-->', $files['url'], $html);
             while (strpos($html, '<!--FileDownUrl-->')) $html = str_replace('<!--FileDownUrl-->', encode_str_replace(path_format($_SERVER['base_disk_path'] . '/' . $path)), $html);

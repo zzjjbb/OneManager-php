@@ -31,7 +31,7 @@
         .title{text-align:center;margin-top:1rem;letter-spacing:2px;margin-bottom:2rem}
         .title a{color:#333;text-decoration:none}
         .list-wrapper{width:80%;margin:0 auto 30px;position:relative;box-shadow:0 0 32px 0 rgb(128,128,128);border-radius:15px;}
-        .list-container{position:relative;/*overflow:hidden;*/border-radius:15px;background-color:rgba(245,245,245,0.5);}
+        .list-container{position:relative;/*overflow:hidden;*/border-radius:15px;background-color:rgba(255,255,255,0.7);}
         .list-container,.list-header-container,.list-wrapper,a.back-link:hover,body{color:#24292e}
         .list-header-container{position:relative}
         .list-header-container a.back-link{color:#000;display:inline-block;position:absolute;font-size:16px;margin:20px 10px;padding:10px 10px;vertical-align:middle;text-decoration:none}
@@ -185,7 +185,7 @@
     <div class="list-wrapper" id="list-div">
         <div class="list-container">
             <div class="list-header-container">
-                <h3 class="table-header"><a href="<!--base_path-->"><!--constStr@Home--></a><!--DiskPathArrayStart--> / <a href="<!--PathArrayLink-->"><!--PathArrayName--></a><!--DiskPathArrayEnd--></h3>
+                <h3 class="table-header" style="padding-bottom: 0"><a href="<!--base_path-->"><!--constStr@Home--></a><!--DiskPathArrayStart--> / <a href="<!--PathArrayLink-->"><!--PathArrayName--></a><!--DiskPathArrayEnd--></h3>
             </div>
             <div class="list-body-container">
 <!--EncryptedStart-->
@@ -214,18 +214,14 @@
 <!--IsFileStart-->
                 <div style="padding: 12px 4px 4px; text-align: center">
                     <div style="margin: 24px">
-                        <textarea id="url" title="url" rows="1" style="width: 100%; margin-top: 2px;" readonly><!--FileEncodeUrl--></textarea>
-                        <a href="<!--FileEncodeUrl-->"><ion-icon name="download" style="line-height: 16px;vertical-align: middle;"></ion-icon>&nbsp;<!--constStr@Download--></a>
-                    </div>
-                    <div style="margin: 24px">
 <!--IsimgFileStart-->
                         <img src="<!--FileEncodeUrl-->" alt="<!--FileName-->" onload="if (this.offsetWidth>document.getElementById('url').offsetWidth) this.style.width='100%';if (this.offsetHeight>document.documentElement.clientHeight) this.style.height=document.documentElement.clientHeight + 'px';" />
 <!--IsimgFileEnd-->
 <!--IsvideoFileStart-->
-                        <div id="video-a0"></div>
+                        <div id="video-a0" style="text-align:initial"></div>
 <!--IsvideoFileEnd-->
 <!--IsplayerFileStart-->
-                        <div style="text-align:initial"><div id="video-a"></div></div>
+                        <div id="video-a" style="text-align:initial"></div>
 <!--IsplayerFileEnd-->
 <!--IsmusicFileStart-->
                         <audio src="<!--FileDownUrl-->" controls="controls" style="width: 100%"></audio>
@@ -638,7 +634,10 @@
 <!--IsplayerFileStart-->
     function createDplayers(video_info) {
         console.log(video_info);
-        video_info.video.defaultQuality = 0;
+        if (!("defaultQuality" in video_info.video)) {
+            video_info.video.defaultQuality = 0;
+            // can be changed to decide by browser type
+        }
         video_info.container = document.getElementById('video-a');
         video_info.screenshot = true
         new DPlayer(video_info);
