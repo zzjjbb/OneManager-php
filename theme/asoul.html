@@ -641,6 +641,13 @@
         video_info.container = document.getElementById('video-a');
         video_info.screenshot = true
         new DPlayer(video_info);
+        // extra player customization
+        let videoDOM = video_info.container.getElementsByTagName('video')[0];
+        videoDOM.setAttribute('x5-video-player-type', 'h5');
+        videoDOM.setAttribute('x5-video-player-fullscreen', 'true');
+        videoDOM.setAttribute('x5-video-orientation', 'landscape');
+        let danmaku_button = video_info.container.getElementsByClassName('dplayer-comment')[0];
+        danmaku_button.remove();
     }
     fetch(decodeURIComponent('<!--FileEncodeDownUrl-->'))
         .then(response => response.json())
