@@ -213,7 +213,7 @@
 
 <!--IsFileStart-->
                 <div style="padding: 12px 4px 4px; text-align: center">
-                    <div style="margin: 24px">
+                    <div style="margin: 24px 10px">
 <!--IsimgFileStart-->
                         <img src="<!--FileEncodeUrl-->" alt="<!--FileName-->" onload="if (this.offsetWidth>document.getElementById('url').offsetWidth) this.style.width='100%';if (this.offsetHeight>document.documentElement.clientHeight) this.style.height=document.documentElement.clientHeight + 'px';" />
 <!--IsimgFileEnd-->
@@ -633,14 +633,14 @@
 <!--VideoLibEnd-->
 <!--IsplayerFileStart-->
     function createDplayers(video_info) {
-        console.log(video_info);
         if (!("defaultQuality" in video_info.video)) {
             video_info.video.defaultQuality = 0;
             // can be changed to decide by browser type
         }
         video_info.container = document.getElementById('video-a');
         video_info.screenshot = true
-        new DPlayer(video_info);
+        let dp = new DPlayer(video_info);
+        console.log(dp);
         // extra player customization
         let videoDOM = video_info.container.getElementsByTagName('video')[0];
         videoDOM.setAttribute('x5-video-player-type', 'h5');
