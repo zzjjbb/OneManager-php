@@ -3,9 +3,9 @@
     "music":"musical-notes",
     "video":"logo-youtube",
     "img":"image",
-    "office":"paper",
+    "office":"newspaper",
     "txt":"clipboard",
-    "zip":"filing",
+    "zip":"file-tray-full",
     "iso":"disc",
     "apk":"logo-android",
     "exe":"logo-windows",
@@ -63,7 +63,7 @@
         .operatediv_close{position:absolute;right:3px;top:3px;}
         .readme{padding:8px;}
         .markdown-body, .customfile{padding:20px;text-align:left}
-        @media only screen and (max-width:480px){
+        @media only screen and (orientation: portrait){
 <!--BackgroundMStart-->
             body{background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--BackgroundMUrl-->");}
 <!--BackgroundMEnd-->
@@ -86,7 +86,7 @@
         <li class="operate"><ion-icon name="construct"></ion-icon><!--constStr@Operate--><ul>
 <!--IsFolderStart-->
             <li><a onclick="showdiv(event,'create','');"><ion-icon name="add-circle"></ion-icon><!--constStr@Create--></a></li>
-            <li><a onclick="showdiv(event,'encrypt','');"><ion-icon name="document-lock"></ion-icon><!--constStr@Encrypt--></a></li>
+            <li><a onclick="showdiv(event,'encrypt','');"><ion-icon name="lock-closed"></ion-icon><!--constStr@Encrypt--></a></li>
             <li><a href="?RefreshCache"><ion-icon name="refresh"></ion-icon><!--constStr@RefreshCache--></a></li>
 <!--IsFolderEnd-->
             <li><a href="<!--IsPreview?-->setup"><ion-icon name="settings"></ion-icon><!--constStr@Setup--></a></li>
@@ -241,7 +241,7 @@
 <!--AdminStart-->
                             <li class="operate"><ion-icon name="construct"></ion-icon><a><!--constStr@Operate--></a>
                             <ul>
-                                <li><a onclick="showdiv(event,'encrypt',<!--filenum-->);"><ion-icon name="document-lock"></ion-icon><!--constStr@Encrypt--></a></li>
+                                <li><a onclick="showdiv(event,'encrypt',<!--filenum-->);"><ion-icon name="lock-closed"></ion-icon><!--constStr@Encrypt--></a></li>
                                 <li><a onclick="showdiv(event, 'rename',<!--filenum-->);"><ion-icon name="create"></ion-icon><!--constStr@Rename--></a></li>
                                 <li><a onclick="showdiv(event, 'move',<!--filenum-->);"><ion-icon name="move"></ion-icon><!--constStr@Move--></a></li>
                                 <li><a onclick="showdiv(event, 'copy',<!--filenum-->);"><ion-icon name="copy"></ion-icon><!--constStr@Copy--></a></li>
@@ -941,7 +941,9 @@
             } else {
                 filemd5 = spark.end();
                 td2.innerHTML='md5: '+filemd5;
+                delete uploading[upbigfilename];
                 upbigfilename = filemd5+ext;
+                uploading[upbigfilename] = i;
 <!--GuestEnd-->
             td2.innerHTML='<!--constStr@GetUploadLink--> ...';
             var xhr1 = new XMLHttpRequest();
@@ -1005,6 +1007,7 @@
         var newstartsize = 0;
         if(!!file){
             var asize=0;
+            var chunksize=10*1024*1024; // chunk size, max 60M. 每小块上传大小，最大60M，微软建议10M
             var totalsize=file.size;
             var xhr2 = new XMLHttpRequest();
             xhr2.open("GET", url);
@@ -1022,8 +1025,6 @@
                     } else {
                         StartStr='<!--constStr@LastUpload-->'+size_format(newstartsize)+ '<br><!--constStr@ThisTime--><!--constStr@UploadStartAt-->:' +StartTime.toLocaleString()+'<br>' ;
                     }
-                    var chunksize=5*1024*1024; // chunk size, max 60M. 每小块上传大小，最大60M，微软建议10M
-                    if (totalsize>200*1024*1024) chunksize=10*1024*1024;
                     function readblob(start) {
                         var end=start+chunksize;
                         var blob = file.slice(start,end);
@@ -1033,6 +1034,7 @@
 
                     reader.onload = function(e){
                         var binary = this.result;
+                        var lastCurrentSpeed;
                         var xhr = new XMLHttpRequest();
                         xhr.open("PUT", url, true);
                         //xhr.setRequestHeader('x-requested-with','XMLHttpRequest');
@@ -1040,9 +1042,10 @@
                         xhr.setRequestHeader('Content-Range', 'bytes ' + asize + '-' + bsize +'/'+ totalsize);
                         xhr.upload.onprogress = function(e){
                             if (e.lengthComputable) {
-                                var tmptime = new Date();
-                                var tmpspeed = e.loaded*1000/(tmptime.getTime()-C_starttime.getTime());
-                                var remaintime = (totalsize-asize-e.loaded)/tmpspeed;
+                                let tmptime = new Date();
+                                let tmpspeed = e.loaded*1000/(tmptime.getTime()-C_starttime.getTime());
+                                lastCurrentSpeed = tmpspeed;
+                                let remaintime = (totalsize-asize-e.loaded)/tmpspeed;
                                 label.innerHTML=StartStr+'<!--constStr@Upload--> ' +size_format(asize+e.loaded)+ ' / '+size_format(totalsize) + ' = ' + ((asize+e.loaded)*100/totalsize).toFixed(2) + '% <!--constStr@AverageSpeed-->:'+size_format((asize+e.loaded-newstartsize)*1000/(tmptime.getTime()-StartTime.getTime()))+'/s<br><!--constStr@CurrentSpeed--> '+size_format(tmpspeed)+'/s <!--constStr@Expect--> '+seconds2hour(remaintime.toFixed(1));
                             }
                         }
@@ -1086,6 +1089,9 @@
                                 } else {
                                     var a=response['nextExpectedRanges'][0];
                                     asize=Number( a.slice(0,a.indexOf("-")) );
+                                    chunksize = 10*1024*1024;
+                                    if (lastCurrentSpeed>5*1024*1024) chunksize = 20*1024*1024;
+                                    if (lastCurrentSpeed>10*1024*1024) chunksize = 50*1024*1024;
                                     readblob(asize);
                                 }
                             } } else readblob(asize);
@@ -1158,7 +1164,6 @@
             uploading[upbigfilename] = [i];
             var spark = sha1.create();
             var reader = new FileReader();
-            var chunksize=10*1024*1024;
             var asize = 0;
             var filesha1;
             function readblob(start) {
@@ -1479,15 +1484,15 @@
         document.getElementById(action + '_fileid').value=fileid;
         document.getElementById(action + '_hidden').value=str;
         if (action=='rename') document.getElementById(action + '_input').value=str;
-        var $e = event || window.event;
-        var $scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+        /*var $e = event || window.event;
+        var $scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;*/
         var $scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-        var $x = $e.pageX || $e.clientX + $scrollX;
+        /*var $x = $e.pageX || $e.clientX + $scrollX;
         var $y = $e.pageY || $e.clientY + $scrollY;
-        if (action=='create') {
+        if (action=='create') {*/
             document.getElementById(action + '_div').style.left=(document.body.clientWidth-document.getElementById(action + '_div').offsetWidth)/2 +'px';
             document.getElementById(action + '_div').style.top=(window.innerHeight-document.getElementById(action + '_div').offsetHeight)/2+$scrollY +'px';
-        } else {
+        /*} else {
             if ($x + document.getElementById(action + '_div').offsetWidth > document.body.clientWidth) {
                 if (document.getElementById(action + '_div').offsetWidth > document.body.clientWidth) {
                     document.getElementById(action + '_div').offsetWidth=document.body.clientWidth+'px';
@@ -1499,7 +1504,7 @@
                 document.getElementById(action + '_div').style.left=$x+'px';
             }
             document.getElementById(action + '_div').style.top=$y+'px';
-        }
+        }*/
         document.getElementById(action + '_input').focus();
     }
     function submit_operate(str) {
@@ -1629,8 +1634,7 @@
     document.getElementById('password1').focus();
 <!--EncryptedEnd-->
 </script>
-<script type="module" src="//unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule="" src="//unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 <!--LoginStart--><script src="https://cdn.bootcss.com/js-sha1/0.6.0/sha1.min.js"></script><!--LoginEnd-->
 <!--customScript-->
 </html>
