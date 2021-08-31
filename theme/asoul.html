@@ -630,6 +630,14 @@
             callback
         );
     }
+    function seekByHash(dp) {
+        return () => {
+            let h = new URLSearchParams(location.hash.substr(1))
+            let time = parseFloat(h.get('t'))
+            isFinite(time) && dp.seek(time)
+            history.replaceState(null,'', ' ')
+        }
+    }
 <!--VideoLibEnd-->
 <!--IsplayerFileStart-->
     function createDplayers(video_info) {
@@ -648,6 +656,9 @@
         videoDOM.setAttribute('x5-video-orientation', 'landscape');
         let danmaku_button = video_info.container.getElementsByClassName('dplayer-comment')[0];
         danmaku_button.remove();
+        let seeker = seekByHash(dp)
+        window.addEventListener("hashchange", seeker)
+        seeker()
     }
     fetch(decodeURIComponent('<!--FileEncodeDownUrl-->'))
         .then(response => response.json())
