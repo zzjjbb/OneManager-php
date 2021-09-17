@@ -191,13 +191,13 @@ function main($path)
     } else {
         $_SERVER['admin']=0;
     }
-    // Added by zjb: USTC CAS Login
-    if (!$_SERVER['admin']) {
-        $login = login_ustc();
-        if (!is_null($login)) {
-            return $login;
-        }
-    }
+//    // Added by zjb: USTC CAS Login
+//    if (!$_SERVER['admin']) {
+//        $login = login_ustc();
+//        if (!is_null($login)) {
+//            return $login;
+//        }
+//    }
     if (isset($_GET['id']) && $_GET['id'] == 'undefined') {
         return output('{"code":0,"data":[]}', 200, ['Content-Type' => 'application/json']);
     }
