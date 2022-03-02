@@ -194,8 +194,8 @@ class Aliyundrive {
         $data['image_url_process'] = 'image/resize,w_1920/format,jpeg';
         $data['video_thumbnail_process'] = 'video/snapshot,t_0,f_jpg,w_300';
         $data['fields'] = '*';
-        $data['order_by'] = 'updated_at';
-        $data['order_direction'] = 'DESC';
+        $data['order_by'] = 'name'; //updated_at
+        $data['order_direction'] = 'ASC'; //DESC
 
         $res = curl('POST', $url, json_encode($data), $header);
         //error_log1($res['stat'] . $res['body']);
@@ -320,6 +320,7 @@ class Aliyundrive {
         return output(json_encode($this->files_format(json_decode($result['body'], true))), $result['stat']);
     }
     public function Copy($file) {
+        return output('NO copy', 415);
         if (!$file['id']) {
             $oldfile = $this->list_path($file['path'] . '/' . $file['name']);
             //error_log1('res:' . json_encode($res));
@@ -631,7 +632,7 @@ class Aliyundrive {
             } else {
                 $str .= '
 <script>
-    var status = "' . $response['status'] . '";
+    var status = "' . $response['DplStatus'] . '";
     var uploadList = setInterval(function(){
         if (document.getElementById("dis").style.display=="none") {
             console.log(min++);
@@ -702,7 +703,7 @@ class Aliyundrive {
     </form>
 </div>
 <script>
-    var status = "' . $response['status'] . '";
+    var status = "' . $response['DplStatus'] . '";
     function notnull(t)
     {
         if (t.driveId.value==\'\') {
@@ -768,7 +769,7 @@ class Aliyundrive {
             }
             return true;
         }
-        var status = "' . $response['status'] . '";
+        var status = "' . $response['DplStatus'] . '";
     </script>
     ';
                 return message($html, $title, 201, 1);
@@ -799,7 +800,7 @@ class Aliyundrive {
                 alert("Do not input ' . $envs . '");
                 return false;
             }
-            var reg = /^[a-zA-Z]([_a-zA-Z0-9]{1,20})$/;
+            var reg = /^[a-zA-Z]([_a-zA-Z0-9]{1,})$/;
             if (!reg.test(t.disktag_add.value)) {
                 alert(\'' . getconstStr('TagFormatAlert') . '\');
                 return false;
