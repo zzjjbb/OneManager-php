@@ -601,6 +601,7 @@
     }
     function addVideos(videos) {
         let host = 'https://s0.pstatp.com/cdn/expire-1-M';
+        let myGithub = 'https://cdn.jsdelivr.net/gh/zzjjbb';
         let unloadedResourceCount = 4;
         let callback = (() => {
             return () => {
@@ -610,13 +611,8 @@
             };
         })(unloadedResourceCount, videos);
         loadResources(
-            'link',
-            host + '/dplayer/1.25.0/DPlayer.min.css',
-            callback
-        );
-        loadResources(
             'script',
-            host + '/dplayer/1.26.0/DPlayer.min.js',
+            myGithub + '/DPlayer@v1.26.0.1/dist/DPlayer.min.js',
             callback
         );
         loadResources(
