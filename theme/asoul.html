@@ -3,9 +3,9 @@
     "music":"musical-notes",
     "video":"logo-youtube",
     "img":"image",
-    "office":"paper",
+    "office":"newspaper",
     "txt":"clipboard",
-    "zip":"filing",
+    "zip":"file-tray-full",
     "iso":"disc",
     "apk":"logo-android",
     "exe":"logo-windows",
@@ -42,7 +42,7 @@
         .more-disk a:hover, .more-disk a[now]{ background-color: rgba(85,85,85,0.7); color: white; }
         .list-table{width:100%;padding:0 20px 20px 20px;border-spacing:0}
         .list-table tr{height:40px}
-        .list-table tr[data-to]:hover{background:rgba(85,85,85,0.7);color:white;}
+        .list-table tr[data-to]:hover{background:rgba(85,85,85,0.7) !important;color:white;}
         .list-table tr[data-to]:hover a{color:white}
         .list-table tr:first-child{background:rgba(245,245,245,0)}
         .list-table td,.list-table th{padding:0 10px;text-align:left}
@@ -71,7 +71,7 @@
         .operatediv_close{position:absolute;right:6px;top:6px;width:16px;cursor:pointer}
         .readme{padding:8px;}
         .markdown-body, .customfile{padding:20px;text-align:left}
-        @media only screen and (max-width:480px){
+        @media only screen and (orientation: portrait){
 <!--BackgroundMStart-->
             body{background-repeat:no-repeat;background-size:cover;background-attachment:fixed;background-image:url("<!--StaticResUrl--><!--BackgroundMUrl-->");}
 <!--BackgroundMEnd-->
@@ -121,7 +121,7 @@
         <li class="operate"><ion-icon name="construct"></ion-icon><!--constStr@Operate--><ul>
 <!--IsFolderStart-->
             <li><a onclick="showdiv(event,'create','');"><ion-icon name="add-circle"></ion-icon><!--constStr@Create--></a></li>
-            <li><a onclick="showdiv(event,'encrypt','');"><ion-icon name="document-lock""></ion-icon><!--constStr@Encrypt--></a></li>
+            <li><a onclick="showdiv(event,'encrypt','');"><ion-icon name="lock-closed"></ion-icon><!--constStr@Encrypt--></a></li>
             <li><a href="?RefreshCache"><ion-icon name="refresh"></ion-icon><!--constStr@RefreshCache--></a></li>
 <!--IsFolderEnd-->
             <li><a href="<!--IsPreview?-->setup"><ion-icon name="settings"></ion-icon><!--constStr@Setup--></a></li>
@@ -129,12 +129,12 @@
         </ul></li>
 <!--AdminEnd-->
         &nbsp;
-        <select class="changelanguage" name="language" onchange="changelanguage(this.options[this.options.selectedIndex].value)">
+        <!--<select class="changelanguage" name="language" onchange="changelanguage(this.options[this.options.selectedIndex].value)">
             <option value="">Language</option>
 <!--SelectLanguageStart-->
                 <option value="<!--SelectLanguageKey-->" <!--SelectLanguageSelected-->><!--SelectLanguageValue--></option>
 <!--SelectLanguageEnd-->
-        </select>
+        </select>-->
     </div>
 <!--NeedUpdateStart-->
     <div style='position:absolute;'><font color='red'><!--constStr@NeedUpdate--></font></div>
@@ -247,7 +247,7 @@
                 <table class="list-table" id="list-table">
                     <tr id="tr0">
                         <th class="file">
-                            <a onclick="sortby('a');"><!--constStr@File--></a>
+                            <a id="file_a0" fileid="<!--FolderId-->" onclick="sortby('a');"><!--constStr@File--></a>
 <!--ShowThumbnailsStart-->
                             &nbsp;&nbsp;&nbsp;
                             <label><input type="checkbox" id="originalpic"><!--constStr@OriginalPic--></label>
@@ -404,11 +404,10 @@
     <div style="color: rgba(247,247,249,0);"><!--FootStr--></div>
 </body>
 
-<!--ListStart-->
 <!--MdRequireStart--><link rel="stylesheet" href="//unpkg.zhimg.com/github-markdown-css@3.0.1/github-markdown.css">
 <script type="text/javascript" src="//unpkg.zhimg.com/marked@0.6.2/marked.min.js"></script><!--MdRequireEnd-->
+<!--ListStart-->
 <!--GuestUploadStart--><script type="text/javascript" src="//cdn.bootcss.com/spark-md5/3.0.0/spark-md5.min.js"></script><!--GuestUploadEnd-->
-<!--AliyundriveUploadJsStart--><script src="https://cdn.bootcss.com/js-sha1/0.6.0/sha1.min.js"></script><!--AliyundriveUploadJsEnd-->
 <!--IsFileStart--><!--IspdfFileStart--><script src="//cdn.bootcss.com/pdf.js/2.3.200/pdf.min.js"></script><!--IspdfFileEnd--><!--IsFileEnd-->
 <!--ListEnd-->
 <script type="text/javascript">
@@ -553,17 +552,60 @@
             f.password1.value = sha1(timestamp + "" + f.password1.value);
             return true;
         } catch {
-            alert("sha1.js not loaded.");
+            //alert("sha1.js not loaded.");
+            if (confirm("sha1.js not loaded.\n\nLoad from program?")) loadjs("?jsFile=sha1.min.js");
             return false;
         }
     }
+    function loadjs(url) {
+        var xhr = new XMLHttpRequest;
+        xhr.open("GET", url);
+        xhr.onload = function(e) {
+            if (xhr.status==200) {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.text = xhr.responseText;
+                document.body.appendChild(script);
+            } else {
+                console.log(xhr.response);
+            }
+        }
+        xhr.send(null);
+    }
 <!--LoginEnd-->
+<!--WriteTimezoneStart-->
+    var nowtime= new Date();
+    var timezone = 0-nowtime.getTimezoneOffset()/60;
+    var expd = new Date();
+    expd.setTime(expd.getTime()+(2*60*60*1000));
+    var expires = "expires="+expd.toGMTString();
+    document.cookie="timezone="+timezone+"; path=/; "+expires;
+    if (timezone!=<!--timezone-->) {
+        //alert('Your timezone is '+timezone+', reload local timezone.');
+        location.href=location.href;
+    }
+<!--WriteTimezoneEnd-->
+<!--HeadmdStart-->
+    var $head = document.getElementById('head');
+    if ($head) {
+        //document.getElementById('head-div').parentNode.insertBefore(document.getElementById('head-div'),document.getElementById('list-div'));
+        $head.innerHTML = marked(document.getElementById('head-md').innerText);
+    }
+<!--HeadmdEnd-->
+<!--ReadmemdStart-->
+    var $readme = document.getElementById('readme');
+    if ($readme) {
+        $readme.innerHTML = marked(document.getElementById('readme-md').innerText);
+    }
+<!--ReadmemdEnd-->
 <!--ListStart-->
-
 <!--IsFileStart-->
     var $url = document.getElementById('url');
     if ($url) {
-        $url.innerHTML = location.protocol + '//' + location.host + $url.innerHTML;
+        //$url.innerHTML = location.protocol + '//' + location.host + $url.innerHTML;
+        let url = location.href;
+        url = url.substr(0, url.length-8);
+        $url.innerHTML = url.replace(/&amp;/g, '&amp;amp;');
         $url.style.height = $url.scrollHeight + 'px';
     }
 <!--IsofficeFileStart-->
@@ -721,19 +763,6 @@
 <!--IspdfFileEnd-->
 <!--IsFileEnd-->
 <!--IsFolderStart-->
-<!--HeadmdStart-->
-    var $head = document.getElementById('head');
-    if ($head) {
-        //document.getElementById('head-div').parentNode.insertBefore(document.getElementById('head-div'),document.getElementById('list-div'));
-        $head.innerHTML = marked(document.getElementById('head-md').innerText);
-    }
-<!--HeadmdEnd-->
-<!--ReadmemdStart-->
-    var $readme = document.getElementById('readme');
-    if ($readme) {
-        $readme.innerHTML = marked(document.getElementById('readme-md').innerText);
-    }
-<!--ReadmemdEnd-->
 <!--ShowThumbnailsStart-->
     function showthumbnails(obj) {
         images = [<!--ImgExts-->];
@@ -862,19 +891,6 @@
         return num;
     }
 <!--IsNotHiddenEnd-->
-<!--IsFolderEnd-->
-<!--WriteTimezoneStart-->
-    var nowtime= new Date();
-    var timezone = 0-nowtime.getTimezoneOffset()/60;
-    var expd = new Date();
-    expd.setTime(expd.getTime()+(2*60*60*1000));
-    var expires = "expires="+expd.toGMTString();
-    document.cookie="timezone="+timezone+"; path=/; "+expires;
-    if (timezone!=<!--timezone-->) {
-        alert('Your timezone is '+timezone+', reload local timezone.');
-        location.href=location.href;
-    }
-<!--WriteTimezoneEnd-->
     function CopyAllDownloadUrl(str) {
         var tmptextarea=document.createElement('textarea');
         document.body.appendChild(tmptextarea);
@@ -887,6 +903,7 @@
         document.execCommand("copy");
         alert(tmptextarea.innerHTML+"<!--constStr@Success-->");
     }
+<!--IsFolderEnd-->
 <!--ListEnd-->
     function operatediv_close(operate) {
         document.getElementById(operate+'_div').style.display='none';
@@ -896,8 +913,8 @@
     document.getElementById('password1').focus();
 <!--EncryptedEnd-->
 </script>
-<script type="module" src="https://unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule="" src="https://unpkg.zhimg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
-<!--LoginStart--><script src="https://cdn.bootcss.com/js-sha1/0.6.0/sha1.min.js"></script><!--LoginEnd-->
+<script type="module" src="https://unpkg.com/ionicons@6.0.1/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@6.0.1/dist/ionicons/ionicons.js"></script>
+<!--LoginStart--><script src="https://www.unpkg.com/js-sha1@0.6.0/src/sha1.js"></script><!--LoginEnd-->
 <!--customScript-->
 </html>
