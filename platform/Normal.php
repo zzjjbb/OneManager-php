@@ -5,12 +5,13 @@ function getpath()
     $_SERVER['firstacceptlanguage'] = strtolower(splitfirst(splitfirst($_SERVER['HTTP_ACCEPT_LANGUAGE'],';')[0],',')[0]);
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
     if (isset($_SERVER['HTTP_FLY_CLIENT_IP'])) $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_FLY_CLIENT_IP'];
+    if ($_SERVER['HTTP_FLY_FORWARDED_PROTO']!='') $_SERVER['REQUEST_SCHEME'] = $_SERVER['HTTP_FLY_FORWARDED_PROTO'];
+    if ($_SERVER['HTTP_X_FORWARDED_PROTO']!='') {
+        $tmp = explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0];
+        if ($tmp=='http'||$tmp=='https') $_SERVER['REQUEST_SCHEME'] = $tmp;
+    }
     if ($_SERVER['REQUEST_SCHEME']!='http'&&$_SERVER['REQUEST_SCHEME']!='https') {
-        if ($_SERVER['HTTP_X_FORWARDED_PROTO']!='') {
-            $tmp = explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0];
-            if ($tmp=='http'||$tmp=='https') $_SERVER['REQUEST_SCHEME'] = $tmp;
-        }
-        if ($_SERVER['HTTP_FLY_FORWARDED_PROTO']!='') $_SERVER['REQUEST_SCHEME'] = $_SERVER['HTTP_FLY_FORWARDED_PROTO'];
+        $_SERVER['REQUEST_SCHEME'] = 'http';
     }
     $_SERVER['host'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
     $_SERVER['referhost'] = explode('/', $_SERVER['HTTP_REFERER'])[2];
@@ -22,8 +23,6 @@ function getpath()
     else $path = $_SERVER['REQUEST_URI'];
     $path = path_format( substr($path, strlen($_SERVER['base_path'])) );
     return $path;
-    //return substr($path, 1);
-    //return spurlencode($path, '/');
 }
 
 function getGET()
@@ -278,8 +277,9 @@ language:<br>';
         $title = getconstStr('SelectLanguage');
         return message($html, $title, 201);
     }
-    $html .= '<a href="?install0">'.getconstStr('ClickInstall').'</a>, '.getconstStr('LogintoBind');
+
     $title = 'Install';
+    $html = '<a href="?install0">' . getconstStr('ClickInstall') . '</a>, ' . getconstStr('LogintoBind');
     return message($html, $title, 201);
 }
 
@@ -311,19 +311,23 @@ function setConfigResponse($response)
     return json_decode($response, true);
 }
 
-function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 'master')
+function OnekeyUpate($GitSource = 'Github', $auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 'master')
 {
-    $slash = '/';
-    if (strpos(__DIR__, ':')) $slash = '\\';
+    global $slash;
     // __DIR__ is xxx/platform
     $projectPath = splitlast(__DIR__, $slash)[0];
 
-    // 从github下载对应tar.gz，并解压
-    $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . urlencode($branch) . '/';
+    if ($GitSource=='Github') {
+        // 从github下载对应tar.gz，并解压
+        $url = 'https://github.com/' . $auth . '/' . $project . '/tarball/' . urlencode($branch) . '/';
+    } elseif ($GitSource=='HITGitlab') {
+        $url = 'https://git.hit.edu.cn/' . $auth . '/' . $project . '/-/archive/' . urlencode($branch) . '/' . $project . '-' . urlencode($branch) . '.tar.gz';
+    } else return 0;
     $tarfile = $projectPath . $slash .'github.tar.gz';
     $githubfile = file_get_contents($url);
     if (!$githubfile) return 0;
     file_put_contents($tarfile, $githubfile);
+
     if (splitfirst(PHP_VERSION, '.')[0] > '5') {
         $phar = new PharData($tarfile); // need php5.3, 7, 8
         $phar->extractTo($projectPath, null, true);//路径 要解压的文件 是否覆盖
@@ -335,14 +339,7 @@ function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 
     unlink($tarfile);
 
     $outPath = '';
-    $tmp = scandir($projectPath);
-    $name = $auth . '-' . $project;
-    foreach ($tmp as $f) {
-        if ( substr($f, 0, strlen($name)) == $name) {
-            $outPath = $projectPath . $slash . $f;
-            break;
-        }
-    }
+    $outPath = findIndexPath($projectPath);
     //error_log1($outPath);
     if ($outPath=='') return 0;
 
@@ -353,11 +350,12 @@ function OnekeyUpate($auth = 'qkqpttgf', $project = 'OneManager-php', $branch = 
         $tmp1['message'] = "Can not move " . $projectPath . $slash . '.data' . $slash . 'config.php' . " to " . $outPath . $slash . '.data' . $slash . 'config.php';
         return json_encode($tmp1);
     }
-    return moveFolder($outPath, $projectPath, $slash);
+    return moveFolder($outPath, $projectPath);
 }
 
-function moveFolder($from, $to, $slash)
+function moveFolder($from, $to)
 {
+    global $slash;
     if (substr($from, -1)==$slash) $from = substr($from, 0, -1);
     if (substr($to, -1)==$slash) $to = substr($to, 0, -1);
     if (!file_exists($to)) mkdir($to, 0777);
@@ -367,7 +365,7 @@ function moveFolder($from, $to, $slash)
             $fromfile = $from . $slash . $filename;
             $tofile = $to . $slash . $filename;
             if(is_dir($fromfile)){// 如果读取的某个对象是文件夹，则递归
-                $response = moveFolder($fromfile, $tofile, $slash);
+                $response = moveFolder($fromfile, $tofile);
                 if (api_error(setConfigResponse($response))) return $response;
             }else{
                 //if (file_exists($tofile)) unlink($tofile);
@@ -388,4 +386,8 @@ function moveFolder($from, $to, $slash)
 
 function WaitFunction() {
     return true;
+}
+
+function changeAuthKey() {
+    return message("Not need.", 'Change platform Auth token or key', 404);
 }
