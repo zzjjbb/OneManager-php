@@ -6,64 +6,67 @@ global $drive;
 
 global $EnvConfigs;
 $EnvConfigs = [
+    // 1 is a switch, 0 input string
     // 1 inner, 0 common
     // 1 showed/enableEdit, 0 hidden/disableEdit
     // 1 base64 to save, 0 not base64
-    'APIKey'            => 0b000, // used in heroku.
-    'SecretId'          => 0b000, // used in SCF/CFC.
-    'SecretKey'         => 0b000, // used in SCF/CFC.
-    'AccessKeyID'       => 0b000, // used in FC.
-    'AccessKeySecret'   => 0b000, // used in FC.
-    'HW_urn'            => 0b000, // used in FG.
-    'HW_key'            => 0b000, // used in FG.
-    'HW_secret'         => 0b000, // used in FG.
-    'HerokuappId'       => 0b000, // used in heroku.
+    'APIKey'            => 0b0000, // used in heroku.
+    'SecretId'          => 0b0000, // used in SCF/CFC.
+    'SecretKey'         => 0b0000, // used in SCF/CFC.
+    'AccessKeyID'       => 0b0000, // used in FC.
+    'AccessKeySecret'   => 0b0000, // used in FC.
+    'HW_urn'            => 0b0000, // used in FG.
+    'HW_key'            => 0b0000, // used in FG.
+    'HW_secret'         => 0b0000, // used in FG.
+    'HerokuappId'       => 0b0000, // used in heroku.
 
-    'admin'             => 0b000,
-    'adminloginpage'    => 0b010,
-    'autoJumpFirstDisk' => 0b010,
-    'background'        => 0b011,
-    'backgroundm'       => 0b011,
-    'staticres'         => 0b011,
-    'disableShowThumb'  => 0b010,
-    //'disableChangeTheme'=> 0b010,
-    'disktag'           => 0b000,
-    'hideFunctionalityFile'=> 0b010,
-    'timezone'          => 0b010,
-    'passfile'          => 0b011,
-    'sitename'          => 0b011,
-    'customScript'      => 0b011,
-    'customCss'         => 0b011,
-    'customTheme'       => 0b011,
-    'theme'             => 0b010,
-    'useBasicAuth'      => 0b010,
-    'referrer'          => 0b011,
-    'forceHttps'        => 0b010,
-    'globalHeadOmfUrl'  => 0b011,
-    'globalHeadMdUrl'   => 0b011,
-    'globalReadmeMdUrl' => 0b011,
-    'globalFootOmfUrl'  => 0b011,
+    'admin'             => 0b0000,
+    'adminloginpage'    => 0b0010,
+    'autoJumpFirstDisk' => 0b1010,
+    'background'        => 0b0011,
+    'backgroundm'       => 0b0011,
+    'staticres'         => 0b0011,
+    'disableShowThumb'  => 0b1010,
+    //'disableChangeTheme'=> 0b1010,
+    'disktag'           => 0b0000,
+    'hideFunctionalityFile'=> 0b1010,
+    'timezone'          => 0b0010,
+    'passfile'          => 0b0011,
+    'sitename'          => 0b0011,
+    'customScript'      => 0b0011,
+    'customCss'         => 0b0011,
+    'customTheme'       => 0b0011,
+    'theme'             => 0b0010,
+    'useBasicAuth'      => 0b1010,
+    'referrer'          => 0b0011,
+    'forceHttps'        => 0b1010,
+    'globalHeadOmfUrl'  => 0b0011,
+    'globalHeadMdUrl'   => 0b0011,
+    'globalReadmeMdUrl' => 0b0011,
+    'globalFootOmfUrl'  => 0b0011,
+    'bcmathUrl'         => 0b0011,
 
-    'Driver'            => 0b100,
-    'client_id'         => 0b100,
-    'client_secret'     => 0b101,
-    'sharepointSite'    => 0b101,
-    'shareurl'          => 0b101,
-    //'sharecookie'       => 0b101,
-    'shareapiurl'       => 0b101,
-    'siteid'            => 0b100,
-    'refresh_token'     => 0b100,
-    'token_expires'     => 0b100,
-    'activeLimit'       => 0b100,
-    'driveId'           => 0b100,
+    'Driver'            => 0b0100,
+    'client_id'         => 0b0100,
+    'client_secret'     => 0b0101,
+    'sharepointSite'    => 0b0101,
+    'shareurl'          => 0b0101,
+    //'sharecookie'       => 0b0101,
+    'shareapiurl'       => 0b0101,
+    'siteid'            => 0b0100,
+    'refresh_token'     => 0b0100,
+    'token_expires'     => 0b0100,
+    'activeLimit'       => 0b0100,
+    'driveId'           => 0b0100,
 
-    'diskname'          => 0b111,
-    'diskDescription'   => 0b111,
-    'domain_path'       => 0b111,
-    'downloadencrypt'   => 0b110,
-    'guestup_path'      => 0b111,
-    'domainforproxy'    => 0b111,
-    'public_path'       => 0b111,
+    'diskDisplay'      => 0b0110,
+    'diskname'          => 0b0111,
+    'diskDescription'   => 0b0111,
+    'domain_path'       => 0b0111,
+    'downloadencrypt'   => 0b1110,
+    'guestup_path'      => 0b0111,
+    'domainforproxy'    => 0b0111,
+    'public_path'       => 0b0111,
     'fileConduitSize'   => 0b110,
     'fileConduitCacheTime'   => 0b110,
 ];
@@ -105,28 +108,35 @@ $timezones = array(
 function isCommonEnv($str)
 {
     global $EnvConfigs;
-    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b100 ) ? false : true;
+    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b0100 ) ? false : true;
     else return null;
 }
 
 function isInnerEnv($str)
 {
     global $EnvConfigs;
-    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b100 ) ? true : false;
+    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b0100 ) ? true : false;
     else return null;
 }
 
 function isShowedEnv($str)
 {
     global $EnvConfigs;
-    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b010 ) ? true : false;
+    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b0010 ) ? true : false;
     else return null;
 }
 
 function isBase64Env($str)
 {
     global $EnvConfigs;
-    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b001 ) ? true : false;
+    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b0001 ) ? true : false;
+    else return null;
+}
+
+function isSwitchEnv($str)
+{
+    global $EnvConfigs;
+    if (isset($EnvConfigs[$str])) return ( $EnvConfigs[$str] & 0b1000 ) ? true : false;
     else return null;
 }
 
@@ -179,7 +189,7 @@ function main($path)
         if (substr($_GET['jsFile'], -3)!='.js') return output('', 403);
         if (!($path==''||$path=='/')) return output('', 308, [ 'Location' => path_format($_SERVER['base_path'] . '/?jsFile=' . $_GET['jsFile']) ]);
         if (strpos($_GET['jsFile'], '/')>-1) $_GET['jsFile'] = splitlast($_GET['jsFile'], '/')[1];
-        $jsFile = file_get_contents('js/' . $_GET['jsFile']);
+        $jsFile = file_get_contents(__DIR__ . '/js/' . $_GET['jsFile']);
         if (!!$jsFile) {
             return output( base64_encode($jsFile), 200, [ 'Content-Type' => 'text/javascript; charset=utf-8', 'Cache-Control' => 'max-age=' . 3*24*60*60 ], true );
         } else {
@@ -227,13 +237,6 @@ function main($path)
     } else {
         $_SERVER['admin']=0;
     }
-//    // Added by zjb: USTC CAS Login
-//    if (!$_SERVER['admin']) {
-//        $login = login_ustc();
-//        if (!is_null($login)) {
-//            return $login;
-//        }
-//    }
     if (isset($_GET['id']) && $_GET['id'] == 'undefined') {
         return output('{"code":0,"data":[]}', 200, ['Content-Type' => 'application/json']);
     }
@@ -283,7 +286,7 @@ function main($path)
             $files['type'] = 'folder';
             $files['childcount'] = count($disktags);
             $files['showname'] = 'root';
-            foreach ($disktags as $disktag) {
+            foreach ($disktags as $disktag) if ($_SERVER['admin']||getConfig('diskDisplay', $disktag)=='') {
                 $files['list'][$disktag]['type'] = 'folder';
                 $files['list'][$disktag]['name'] = $disktag;
                 $files['list'][$disktag]['showname'] = getConfig('diskname', $disktag);
@@ -297,7 +300,7 @@ function main($path)
             $_SERVER['disktag'] = splitfirst( substr(path_format($path), 1), '/' )[0];
             //$pos = strpos($path, '/');
             //if ($pos>1) $_SERVER['disktag'] = substr($path, 0, $pos);
-            if (!in_array($_SERVER['disktag'], $disktags)) {
+            if ((!$_SERVER['admin']&&getConfig('diskDisplay', $_SERVER['disktag'])=='disable')||!in_array($_SERVER['disktag'], $disktags)) {
                 $tmp = path_format($_SERVER['base_path'] . '/' . $disktags[0] . '/' . $path);
                 if (!!$_GET) {
                     $tmp .= '?';
@@ -331,12 +334,13 @@ function main($path)
         //error_log1($_SERVER['REQUEST_METHOD']);
         if ($_GET['action']=='del_upload_cache') {
             // del '.tmp' without login. 无需登录即可删除.tmp后缀文件
-            if (!driveisfine($_SERVER['disktag'], $drive)) return output('Not in drive, or disk [' . $_SERVER['disktag'] . '] error.', 403);
+            if (!driveisfine($_SERVER['disktag'], $drive)) return output($_SERVER['disktag']?'disk [ ' . $_SERVER['disktag'] . ' ] error.':'Not in drive', 403);
             savecache('path_' . $path1, '', $_SERVER['disktag'], 1); // clear cache.
             return $drive->del_upload_cache($path);
         }
+
         if ($_GET['action']=='upbigfile') {
-            if (!driveisfine($_SERVER['disktag'], $drive)) return output('Not in drive, or disk [' . $_SERVER['disktag'] . '] error.', 403);
+            if (!driveisfine($_SERVER['disktag'], $drive)) return output($_SERVER['disktag']?'disk [ ' . $_SERVER['disktag'] . ' ] error.':'Not in drive', 403);
             if (!$_SERVER['admin']) {
                 if (!$_SERVER['is_guestup_path']) return output('Not_Guest_Upload_Folder', 400);
                 if (strpos($_GET['upbigfilename'], '../')!==false) return output('Not_Allow_Cross_Path', 400);
@@ -345,7 +349,20 @@ function main($path)
             return $drive->bigfileupload($path1);
         }
     }
-
+    if ($_GET['action']=='upsmallfile') {
+        //echo json_encode($_POST, JSON_PRETTY_PRINT);
+        //echo json_encode($_FILES, JSON_PRETTY_PRINT);
+        if (!driveisfine($_SERVER['disktag'], $drive)) return output($_SERVER['disktag']?'disk [ ' . $_SERVER['disktag'] . ' ] error.':'Not in drive', 403);
+        if (!$_SERVER['admin']) {
+            if (!$_SERVER['is_guestup_path']) return output('Not_Guest_Upload_Folder', 400);
+            if (strpos($_GET['upbigfilename'], '../')!==false) return output('Not_Allow_Cross_Path', 400);
+            if (strpos($_POST['upbigfilename'], '../')!==false) return output('Not_Allow_Cross_Path', 400);
+        }
+        return smallfileupload($drive, $path);
+        /*if ($_FILES['file1']['error']) return output($_FILES['file1']['error'], 400);
+        if ($_FILES['file1']['size']>4*1024*1024) return output('File too large', 400);
+        return $drive->smallfileupload($path, $_FILES['file1']);*/
+    }
     if ($_SERVER['admin']) {
         $tmp = adminoperate($path);
         if ($tmp['statusCode'] > 0) {
@@ -396,6 +413,7 @@ function main($path)
     } else {
         $files = $drive->list_files($path1);
     }
+    //echo "<pre>" . json_encode($files, 448) . "</pre>";
     //if ($path!=='')
     if ( $files['type']=='folder' && substr($path, -1)!=='/' ) {
         $tmp = path_format($_SERVER['base_disk_path'] . $path . '/');
@@ -457,33 +475,42 @@ function main($path)
                 $fileConduitSize = getConfig('fileConduitSize', $_SERVER['disktag']);
                 $fileConduitCacheTime = getConfig('fileConduitCacheTime', $_SERVER['disktag']);
                 if (!!$fileConduitSize || !!$fileConduitCacheTime) {
-                    if ($fileConduitSize>1) $fileConduitSize *= 1024*1024;
+                    if ($fileConduitSize>0) $fileConduitSize *= 1024*1024;
                     else $fileConduitSize = 1024*1024;
-                    if ($fileConduitCacheTime>1) $fileConduitCacheTime *= 3600;
+                    if ($fileConduitCacheTime>0) $fileConduitCacheTime *= 3600;
                     else $fileConduitCacheTime = 3600;
                     /*if ($_SERVER['HTTP_RANGE']!='') {
                         $header['Range'] = $_SERVER['HTTP_RANGE'];
+
                         $response = curl('GET', $files['url'], '', $header, 1);
                         //return output($header['Range'] . json_encode($response['returnhead']));
                         return output(
                             $response['body'],
                             $response['stat'],
-                            //$response['returnhead'],
-                            ['Content-Type' => $files['mime'], 'Cache-Control' => 'max-age=' . $fileConduitCacheTime],
+                            $response['returnhead'],
+                            //['Accept-Ranges' => 'bytes', 'Range' => $response['returnhead']['Range'], 'Content-Type' => $files['mime'], 'Cache-Control' => 'max-age=' . $fileConduitCacheTime],
                             false
+                        );
+                    } else {
+                        return output('', 206,
+                            ['Accept-Ranges' => 'bytes', 'Content-Range' => 'bytes 0-0/' . $files['size'], 'Content-Type' => $files['mime'] ]
                         );
                     }*/
                     if ($files['size']<$fileConduitSize) return output(
                         base64_encode(file_get_contents($files['url'])),
                         200,
                         [
+                            'Accept-Ranges' => 'bytes',
+                            //'access-control-allow-origin' => '*',
+                            //'access-control-expose-headers' => 'Content-Length, WWW-Authenticate, Location, Accept-Ranges',
                             'Content-Type' => $files['mime'],
                             'Cache-Control' => 'max-age=' . $fileConduitCacheTime,
                             //'Cache-Control' => 'max-age=0',
                             'Last-Modified' => gmdate('D, d M Y H:i:s T', strtotime($files['time']))
-                        ],
+                        ], 
                         true
                     );
+                    //if ($files['size']<$fileConduitSize) return $drive->ConduitDown($files['url'], $files['time'], $fileConduitCacheTime);
                 }
                 if ($_SERVER['HTTP_RANGE']!='') $header['Range'] = $_SERVER['HTTP_RANGE'];
                 $header['Location'] = $url;
@@ -501,12 +528,13 @@ function main($path)
         return render_list($path, $files);
     } else {
         if (!isset($files['error'])) {
-            if (is_array($files)) $files['error']['message'] = json_encode($files, JSON_PRETTY_PRINT);
-            else $files['error']['message'] = $files;
-            $files['error']['code'] = 'unknownError';
-            $files['error']['stat'] = 500;
+            if (is_array($files)) {
+                $files['error']['message'] = json_encode($files, JSON_PRETTY_PRINT);
+                $files['error']['code'] = 'unknownError';
+                $files['error']['stat'] = 500;
+            }
         }
-        return message('<div style="margin:8px;"><pre>' . $files['error']['message'] . '</pre></div><a href="javascript:history.back(-1)">'.getconstStr('Back').'</a>', $files['error']['code'], $files['error']['stat']);
+        return message('<div style="margin:8px;"><pre>' . $files.json_encode($files, JSON_PRETTY_PRINT) . '</pre></div><a href="javascript:history.back(-1)">'.getconstStr('Back').'</a>', $files['error']['code'], $files['error']['stat']);
     }
 }
 
@@ -629,6 +657,14 @@ function proxy_replace_domain($url, $domainforproxy, &$header)
     if ($drive->show_base_class()=='Aliyundrive') $aim .= '&Aliyundrive';
     $header['Location'] = $aim;
     return $aim . '/' . $uri . $sp . 'Origindomain=' . $domain;
+}
+
+function bchexdec($hex) {
+    $len = strlen($hex);
+    for ($i = 1; $i <= $len; $i++)
+        $dec = bcadd($dec, bcmul(strval(hexdec($hex[$i - 1])), bcpow('16', strval($len - $i))));
+
+    return $dec;
 }
 
 function isHideFile($name)
@@ -860,7 +896,7 @@ function curl($method, $url, $data = '', $headers = [], $returnheader = 0, $loca
     }
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST,$method);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_TIMEOUT, 5);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
@@ -872,7 +908,9 @@ function curl($method, $url, $data = '', $headers = [], $returnheader = 0, $loca
     if ($location) curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     //$response['body'] = curl_exec($ch);
     if ($returnheader) {
-        list($returnhead, $response['body']) = explode("\r\n\r\n", curl_exec($ch));
+        $tmpres = splitlast(curl_exec($ch), "\r\n\r\n");
+        $result['body'] = $tmpres[1];
+        $returnhead = $tmpres[0];
         //echo "HEAD:" . $returnhead;
         foreach (explode("\r\n", $returnhead) as $head) {
             $tmp = explode(': ', $head);
@@ -882,7 +920,7 @@ function curl($method, $url, $data = '', $headers = [], $returnheader = 0, $loca
     } else {
         $response['body'] = curl_exec($ch);
     }
-    $response['stat'] = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+    $response['stat'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     return $response;
 }
@@ -1021,7 +1059,7 @@ function message($message, $title = 'Message', $statusCode = 200, $wainstat = 0)
                             //setTimeout(function() { getStatus() }, 1000);
                         }
                     } else if (xhr.status==206) {
-                        errordiv.innerHTML = "' . getconstStr('Wait') . '" + x + "<br>" + min;
+                        errordiv.innerHTML = "' . getconstStr('Wait') . ' " + min + "<br>" + x;
                         setTimeout(function() { getStatus() }, 1000);
                     } else {
                         errordiv.innerHTML = "ERROR<br>" + xhr.status + "<br>" + xhr.responseText;
@@ -1074,7 +1112,7 @@ function needUpdate()
 function output($body, $statusCode = 200, $headers = ['Content-Type' => 'text/html'], $isBase64Encoded = false)
 {
     if (isset($_SERVER['Set-Cookie'])) $headers['Set-Cookie'] = $_SERVER['Set-Cookie'];
-    if (baseclassofdrive()=='Aliyundrive') $headers['Referrer-Policy'] = 'no-referrer';
+    if (baseclassofdrive()=='Aliyundrive' || baseclassofdrive()=='BaiduDisk') $headers['Referrer-Policy'] = 'no-referrer';
     //$headers['Referrer-Policy'] = 'same-origin';
     //$headers['X-Frame-Options'] = 'sameorigin';
     return [
@@ -1211,7 +1249,7 @@ function adminform($name = '', $pass = '', $storage = '', $path = '')
 function adminoperate($path)
 {
     global $drive;
-    if ($_SERVER['REQUEST_METHOD']=='POST') if (!driveisfine($_SERVER['disktag'], $drive)) return output('Not in drive, or disk [' . $_SERVER['disktag'] . '] error.', 403);
+    if ($_SERVER['REQUEST_METHOD']=='POST') if (!driveisfine($_SERVER['disktag'], $drive)) return output($_SERVER['disktag']?'disk [ ' . $_SERVER['disktag'] . ' ] error.':'Not in drive', 403);
     $path1 = path_format($_SERVER['list_path'] . '/' . $path);
     if (substr($path1, -1)=='/') $path1=substr($path1, 0, -1);
     $tmpget = $_GET;
@@ -1526,7 +1564,7 @@ function EnvOpt($needUpdate = 0)
         $html .= '
 OneManager DIR: ' . __DIR__ . '
 <form name="form1" method="POST" action="">
-    <input id="inputarea" name="cmd" style="width:100%" value="' . $_POST['cmd'] . '" placeholder="ls, pwd, cat"><br>
+    <input id="inputarea" name="cmd" style="width:100%" value="' . htmlspecialchars($_POST['cmd']) . '" placeholder="ls, pwd, cat"><br>
     <input type="submit" value="post">
 </form>';
         if ($_POST['cmd']!='') {
@@ -1589,6 +1627,13 @@ output:
                     <option value="'.$v1.'" '.($v1==getConfig($key)?'selected="selected"':'').'>'.$v1.'</option>';
             }
             $frame .= '
+                </select>
+                ' . getconstStr('EnvironmentsDescription')[$key];
+        } elseif (isSwitchEnv($key)) {
+            $frame .= '
+                <select name="' . $key . '">
+                    <option value=""></option>
+                    <option value="1"' . (getConfig($key)?' selected="selected"':'') . '>true</option>
                 </select>
                 ' . getconstStr('EnvironmentsDescription')[$key];
         } /*elseif ($key=='domain_path') {
@@ -1676,7 +1721,28 @@ output:
                 $frame .= '
     <tr>
         <td><label>' . $key . '</label></td>
-        <td width=100%><input type="text" name="' . $key . '" value="' . getConfig($key, $disktag) . '" placeholder="' . getconstStr('EnvironmentsDescription')[$key] . '" style="width:100%"></td>
+        <td width=100%>';
+                if ($key=='diskDisplay') {
+                    $frame .= '
+            <select name="' . $key . '">
+                <option value=""' . (getConfig($key, $disktag)===''?' selected':'') . '> </option>
+                <option value="hidden"' . (getConfig($key, $disktag)==='hidden'?' selected':'') . '>hidden</option>
+                <option value="disable"' . (getConfig($key, $disktag)==='disable'?' selected':'') . '>disable</option>
+            </select>
+            ' . getconstStr('EnvironmentsDescription')[$key];
+                } elseif (isSwitchEnv($key)) {
+                    $frame .= '
+            <select name="' . $key . '">
+                <option value=""></option>
+                <option value="1"' . (getConfig($key)?' selected="selected"':'') . '>true</option>
+            </select>
+            ' . getconstStr('EnvironmentsDescription')[$key];
+                } else {
+                    $frame .= '
+            <input type="text" name="' . $key . '" value="' . getConfig($key, $disktag) . '" placeholder="' . getconstStr('EnvironmentsDescription')[$key] . '" style="width:100%">';
+                }
+                $frame .= '
+        </td>
     </tr>';
             }
             $frame .= '
@@ -2162,7 +2228,13 @@ function render_list($path = '', $files = [])
     $p_path='';
     if ($path1 !== '/') {
         if ($files['type']=='file') {
-            $pretitle = str_replace('&','&amp;', $files['name']);
+            if (isset($files['name'])) {
+                $pretitle = str_replace('&','&amp;', $files['name']);
+            } else {
+                if (substr($path1, 0, 1)=='/') $pretitle = substr($path1, 1);
+                if (substr($path1, -1)=='/') $pretitle = substr($pretitle, 0, -1);
+                $pretitle = str_replace('&','&amp;', $pretitle);
+            }
             $n_path = $pretitle;
             $tmp = splitlast(splitlast($path1,'/')[0],'/');
             if ($tmp[1]=='') {
@@ -2201,9 +2273,6 @@ function render_list($path = '', $files = [])
     OneManager: An index & manager of Onedrive auth by ysun.
     HIT Gitlab: https://git.hit.edu.cn/ysun/OneManager-php
     Github: https://github.com/qkqpttgf/OneManager-php
-    
-    A-SOUL Live Records: modified by zzjjbb
-    Github: https://github.com/zzjjbb/OneManager-php
 -->';
     //$authinfo = $path . '<br><pre>' . json_encode($files, JSON_PRETTY_PRINT) . '</pre>';
 
@@ -2341,22 +2410,22 @@ function render_list($path = '', $files = [])
             while (strpos($html, '<!--GuestEnd-->')) $html = str_replace('<!--GuestEnd-->', '', $html);
         }
 
-        if (isset($_SERVER['userinfo'])) {
-            while (strpos($html, '<!--UserStart-->')) $html = str_replace('<!--UserStart-->', '', $html);
-            while (strpos($html, '<!--UserEnd-->')) $html = str_replace('<!--UserEnd-->', '', $html);
-            while (strpos($html, '<!--UserInfo@name-->')) $html = str_replace('<!--UserInfo@name-->', htmlspecialchars($_SERVER['userinfo'][3]?:$_SERVER['userinfo'][0]), $html);
-            while (strpos($html, '<!--UserInfo@avatar-->')) $html = str_replace('<!--UserInfo@avatar-->', $_SERVER['userinfo'][4]??'i1.hdslb.com/bfs/face/3c6deaa829bb63363435f160451975e03cfdc52f.jpg', $html);
-            while (strpos($html, '<!--UserInfo@extra-->')) $html = str_replace('<!--UserInfo@extra-->', htmlspecialchars($_SERVER['userinfo'][5]??''), $html);
-        }
-        else {
-            $tmp[1] = 'a';
-            while ($tmp[1]!='') {
-                $tmp = splitfirst($html, '<!--UserStart-->');
-                $html = $tmp[0];
-                $tmp = splitfirst($tmp[1], '<!--UserEnd-->');
-                $html .= $tmp[1];
-            }
-        }
+//        if (isset($_SERVER['userinfo'])) {
+//            while (strpos($html, '<!--UserStart-->')) $html = str_replace('<!--UserStart-->', '', $html);
+//            while (strpos($html, '<!--UserEnd-->')) $html = str_replace('<!--UserEnd-->', '', $html);
+//            while (strpos($html, '<!--UserInfo@name-->')) $html = str_replace('<!--UserInfo@name-->', htmlspecialchars($_SERVER['userinfo'][3]?:$_SERVER['userinfo'][0]), $html);
+//            while (strpos($html, '<!--UserInfo@avatar-->')) $html = str_replace('<!--UserInfo@avatar-->', $_SERVER['userinfo'][4]??'i1.hdslb.com/bfs/face/3c6deaa829bb63363435f160451975e03cfdc52f.jpg', $html);
+//            while (strpos($html, '<!--UserInfo@extra-->')) $html = str_replace('<!--UserInfo@extra-->', htmlspecialchars($_SERVER['userinfo'][5]??''), $html);
+//        }
+//        else {
+//            $tmp[1] = 'a';
+//            while ($tmp[1]!='') {
+//                $tmp = splitfirst($html, '<!--UserStart-->');
+//                $html = $tmp[0];
+//                $tmp = splitfirst($tmp[1], '<!--UserEnd-->');
+//                $html .= $tmp[1];
+//            }
+//        }
 
         if ($_SERVER['ishidden']<4 || ($files['type']=='file'&&getConfig('downloadencrypt', $_SERVER['disktag']))) {
             while (strpos($html, '<!--EncryptedStart-->')) {
@@ -2968,7 +3037,7 @@ function render_list($path = '', $files = [])
             $MultiDiskArea = $tmp[0];
             $tmp = splitfirst($tmp[1], '<!--MultiDisksEnd-->');
             $MultiDisks = $tmp[0];
-            foreach ($disktags as $disk) {
+            foreach ($disktags as $disk) if ($_SERVER['admin']||getConfig('diskDisplay', $disk)=='') {
                 $diskname = getConfig('diskname', $disk);
                 if ($diskname=='') $diskname = $disk;
                 $MultiDisksStr = str_replace('<!--MultiDisksUrl-->', path_format($_SERVER['base_path'].'/'.$disk.'/'), $MultiDisks);
@@ -3223,110 +3292,4 @@ function render_list($path = '', $files = [])
     $html = $tmp[0] . '</title>' . $authinfo . $tmp[1];
     //if (isset($_SERVER['Set-Cookie'])) return output($html, $statusCode, [ 'Set-Cookie' => $_SERVER['Set-Cookie'], 'Content-Type' => 'text/html' ]);
     return output($html, $statusCode);
-}
-
-function login_ustc()
-{
-    if (isset($_GET['userLogout'])) {
-        return output('try to logout');
-    }
-    if (isset($_COOKIE['USTCSESS'])) {
-        $ticket = $_COOKIE['USTCSESS'];
-        $conn = databaseConnect();
-        $query = pg_query_params($conn, 'select * from ustc where ticket=$1', [$ticket]);
-        if (!$query) {
-            // Extra possible case: invalid USTCSESS
-            setcookie('USTCSESS', '', time() - 1, '/', null, true);
-            return message('Debug info: ' . database_debug($conn), 'Illegal request!', 403);
-        }
-        $userinfo = pg_fetch_row($query, 0);
-        if ($userinfo) {
-            $_SERVER['userinfo'] = $userinfo;
-            if (isset($_POST['setinfo_nickname']))
-                return update_ustc($conn, $userinfo[0]);
-            return null;
-        }
-    }
-    if (isset($_POST['setinfo_nickname']))
-        return output("user unauthorized",401);
-
-    $ustc_redirect = 'service=' . urlencode('https://' . $_SERVER['HTTP_HOST'] . '?.ustc.edu.cn');
-    if (isset($_GET['ticket'])) {
-        $ustc_response = curl('GET', 'https://passport.ustc.edu.cn/serviceValidate?' . $ustc_redirect . '&ticket=' . $_GET['ticket'])['body'];
-        $ustc_xml = simplexml_load_string($ustc_response, null, null, 'http://www.yale.edu/tp/cas');
-        if (isset($ustc_xml->authenticationSuccess->user)) {
-            $user = strval($ustc_xml->authenticationSuccess->user);
-            $ticket = substr($_GET['ticket'], 3);
-            if (strlen($user) != 10) {
-                return message('Unable to process special user id' . $user, 'Error', 403);
-            }
-            if (!isset($conn) || !$conn) {
-                $conn = databaseConnect();
-            }
-            $query = pg_query_params($conn, 'select * from ustc where "user"=$1', [$user]);
-            if (!$query) {
-                return message('Database error 2 ' . database_debug($conn), 'Error', 500);
-            }
-            $userinfo = pg_fetch_row($query, 0);
-            if ($userinfo && $userinfo[1]) $ticket = $userinfo[1];
-            $query = pg_query_params($conn,
-                $userinfo ? 'update ustc set ticket=$2,response=$3 where "user"=$1' : 'insert into ustc values ($1,$2,$3)',
-                [$user, $ticket, $ustc_response]);
-            if (!$query) {
-                return message('Database error 3 ' . database_debug($conn), 'Error', 500);
-            }
-            setcookie('USTCSESS', $ticket, time() + 7 * 86400, '/', null, true);
-            setcookie('goto_page', '', time() - 1, '/');
-            return output('', 302, ['Location' => $_COOKIE['goto_page'] ?? '/']);
-        } else {
-            return message('Response from passport.ustc.edu.cn:<br>' . htmlspecialchars($ustc_response), 'Login failed!', 401);
-        }
-    } else {
-        setcookie("goto_page", $_SERVER['REQUEST_URI'], time() + 300, '/');
-        return output('', 302, ['Location' => 'https://passport.ustc.edu.cn/login?' . $ustc_redirect]);
-    }
-}
-
-function database_debug($conn)
-{
-    if ( isset($_COOKIE['admin_debug'])&&compareadminmd5($_COOKIE['admin_debug'], 'admin', getConfig('admin')) ) {
-        return pg_last_error($conn);
-    } else {
-        return 'ERROR LOG IS HIDDEN';
-    }
-}
-
-function update_ustc($conn, $user_id)
-{
-    $user_nickname=$_POST['setinfo_nickname'];
-    $user_avatar_uid=$_POST['setinfo_avatar']??'';
-    $user_extra=$_POST['setinfo_extra']??'';
-    $modified = ['uid'=>$user_id,'nickname'=>$user_nickname,'extra'=>$user_extra];
-
-    if ($user_nickname==''){
-        return output('E1, POST: '.json_encode($_POST), 403);
-    }
-    if ($user_avatar_uid==''){
-        $query = pg_query_params($conn, 'update ustc set nickname=$2,extra=$3 where "user"=$1',
-            [$user_id, $user_nickname, $user_extra]);
-        if (!$query)
-            return output('E2, db info: ' . database_debug($conn).'<br>POST: '.json_encode($_POST), 500);
-    }
-    elseif (preg_match('/^\d+$/',$user_avatar_uid)) {
-        $bili_response = curl('GET', 'https://api.bilibili.com/x/space/acc/info?mid=' . $user_avatar_uid)['body'];
-        if (preg_match('/^https?:\/\/(i[012]\.hdslb\.com\/.*)$/',json_decode($bili_response)->data->face??'',$matches)){
-            $user_avatar=$matches[1];
-            $query = pg_query_params($conn, 'update ustc set nickname=$2,avatar=$4,extra=$3 where "user"=$1',
-                [$user_id, $user_nickname, $user_extra, $user_avatar]);
-            if (!$query)
-                return output('E3, db info: ' . database_debug($conn).'<br>POST: '.json_encode($_POST).'<br>bilibili response'.$bili_response, 500);
-            $modified['avatar'] = $user_avatar;
-        }
-        else
-            return output('E4, bili: '.$bili_response, 500);
-    }
-    else{
-        return output('E5, POST: '.json_encode($_POST), 403);
-    }
-    return output('SUCC, userinfo'.json_encode($modified));
 }
