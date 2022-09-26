@@ -100,6 +100,9 @@
     </style>
 <!--UserEnd-->
     <!--customCss-->
+    <script>
+        StaticResUrl = "<!--StaticResUrl-->"
+    </script>
 </head>
 
 <body>
@@ -404,11 +407,13 @@
     <div style="color: rgba(247,247,249,0);"><!--FootStr--></div>
 </body>
 
-<!--MdRequireStart--><link rel="stylesheet" href="//unpkg.zhimg.com/github-markdown-css@3.0.1/github-markdown.css">
-<script type="text/javascript" src="//unpkg.zhimg.com/marked@0.6.2/marked.min.js"></script><!--MdRequireEnd-->
+<!--MdRequireStart--><link rel="stylesheet" href="https://unpkg.com/github-markdown-css@3.0.1/github-markdown.css">
+<script type="text/javascript" src="?jsFile=marked.js"></script><!--MdRequireEnd-->
 <!--ListStart-->
-<!--GuestUploadStart--><script type="text/javascript" src="//cdn.bootcss.com/spark-md5/3.0.0/spark-md5.min.js"></script><!--GuestUploadEnd-->
-<!--IsFileStart--><!--IspdfFileStart--><script src="//cdn.bootcss.com/pdf.js/2.3.200/pdf.min.js"></script><!--IspdfFileEnd--><!--IsFileEnd-->
+<!--GuestUploadStart--><script type="text/javascript" src="?jsFile=spark-md5.min.js"></script><!--GuestUploadEnd-->
+<!--AliyundriveUploadJsStart--><script src="https://unpkg.com/bignumber.js@9.0.2/bignumber.js"></script>
+<script src="?jsFile=sha1.min.js"></script><!--AliyundriveUploadJsEnd-->
+<!--IsFileStart--><!--IspdfFileStart--><script src="https://unpkg.com/pdfjs-dist@2.4.456/build/pdf.min.js"></script><!--IspdfFileEnd--><!--IsFileEnd-->
 <!--ListEnd-->
 <script type="text/javascript">
     function changelanguage(str)
@@ -723,29 +728,67 @@
             });
         }
     }
-    addVideos(['<!--FileEncodeUrl-->']);
+    addVideos(["<!--FileEncodeUrl-->"]);
 <!--IsvideoFileEnd-->
 <!--IspdfFileStart-->
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.bootcss.com/pdf.js/2.3.200/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@2.4.456/build/pdf.worker.min.js';
     var loadingTask = pdfjsLib.getDocument({
-        url: '<!--FileDownUrl-->',
-        cMapUrl: "//cdn.jsdelivr.net/npm/pdfjs-dist@2.2.228/cmaps/",
+        url: "<!--FileDownUrl-->",
+        cMapUrl: "https://unpkg.com/pdfjs-dist@2.4.456/cmaps/",
         cMapPacked: true,
+        disableStream: true,
+        disableAutoFetch: true,
         rangeChunkSize: 65535
     });
+    /*loadingTask.onProgress = (e) => {
+        //console.log(e);
+        var p = document.getElementById('p');
+        if (p==null) {
+            p = document.createElement('div');
+            p.id = 'p';
+            p.setAttribute('onclick', "this.style.display = 'none';");
+            p.style = 'left: 10px; top: 30%; position: fixed;';
+            document.body.appendChild(p);
+        }
+        p.innerHTML = 'Loaded: ' + ((e.loaded/e.total)*100).toFixed(2) + '%<br>(' + size_format(e.loaded) + ' / ' + size_format(e.total) + ')';
+        p.style.display = '';
+        if (e.loaded==e.total) p.style.display = 'none';
+
+    }*/
     loadingTask.promise.then(function(pdf) {
         var pagenum =  pdf.numPages;
         var pdfContainer = document.getElementById('pdf-d');
         pdfContainer.innerHTML = '';
-        for (var i=1;i<=pagenum;i++) {
-            var canvasNew = document.createElement('canvas');
-            canvasNew.id = 'pdf-c'+i;
-            pdfContainer.appendChild(canvasNew);
-            renderpage(pdf,i);
-        }
+        var pagepos = 1;
+        var pdfnextpagebutton = document.createElement('button');
+        pdfnextpagebutton.id = 'pdfnextpagebutton';
+        pdfnextpagebutton.innerText = 'Load page ' + pagepos + '-' + (pagepos+4<pagenum?pagepos+4:pagenum) + ' (' + pagenum + ')';
+        pdfnextpagebutton.setAttribute('onclick', "this.style.display = 'none';");
+        pdfnextpagebutton.style.display = 'none';
+        pdfContainer.appendChild(pdfnextpagebutton);
+        var pdfWaitNextPage = setInterval(function(){
+            //console.log(document.documentElement.scrollTop + ", " + document.body.scrollHeight);
+            if (pdfnextpagebutton.style.display=='none') {
+                for (var i=pagepos;i<=(pagepos+4<pagenum?pagepos+4:pagenum);i++) {
+                    var canvasNew = document.createElement('canvas');
+                    canvasNew.id = 'pdf-c'+i;
+                    pdfContainer.appendChild(canvasNew);
+                    renderpage(pdf,i);
+                }
+                pagepos = i;
+                if (pagepos<pagenum) {
+                    console.log("next page: " + pagepos + " / " + pagenum);
+                    pdfnextpagebutton.innerText = 'Load page ' + pagepos + '-' + (pagepos+4<pagenum?pagepos+4:pagenum) + ' (' + pagenum + ')';
+                    pdfnextpagebutton.style.display ='';
+                    pdfContainer.appendChild(pdfnextpagebutton);
+                } else {
+                    console.log("end of pdf");
+                    clearInterval(pdfWaitNextPage);
+                }
+            }
+        }, 1000);
     });
-    function renderpage(pdf,i)
-    {
+    function renderpage(pdf,i) {
         pdf.getPage(i).then(function(page) { 
             var scale = 1.5;
             var viewport = page.getViewport({ scale: scale, });
@@ -759,6 +802,24 @@
             };
             page.render(renderContext);
         });
+    }
+    function size_format(num) {
+        if (num>1024) {
+            num=num/1024;
+        } else {
+            return num.toFixed(2) + ' B';
+        }
+        if (num>1024) {
+            num=num/1024;
+        } else {
+            return num.toFixed(2) + ' KB';
+        }
+        if (num>1024) {
+            num=num/1024;
+        } else {
+            return num.toFixed(2) + ' MB';
+        }
+        return num.toFixed(2) + ' GB';
     }
 <!--IspdfFileEnd-->
 <!--IsFileEnd-->
@@ -884,6 +945,7 @@
     }
     function size_reformat(str) {
         if (str.substr(-1)==' ') str=str.substr(0,str.length-1);
+        if (str.substr(-2)=='TB') num=str.substr(0,str.length-3)*1024*1024*1024*1024;
         if (str.substr(-2)=='GB') num=str.substr(0,str.length-3)*1024*1024*1024;
         if (str.substr(-2)=='MB') num=str.substr(0,str.length-3)*1024*1024;
         if (str.substr(-2)=='KB') num=str.substr(0,str.length-3)*1024;
@@ -891,6 +953,7 @@
         return num;
     }
 <!--IsNotHiddenEnd-->
+<!--IsFolderEnd-->
     function CopyAllDownloadUrl(str) {
         var tmptextarea=document.createElement('textarea');
         document.body.appendChild(tmptextarea);
@@ -903,7 +966,6 @@
         document.execCommand("copy");
         alert(tmptextarea.innerHTML+"<!--constStr@Success-->");
     }
-<!--IsFolderEnd-->
 <!--ListEnd-->
     function operatediv_close(operate) {
         document.getElementById(operate+'_div').style.display='none';
@@ -915,6 +977,6 @@
 </script>
 <script type="module" src="https://unpkg.com/ionicons@6.0.1/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@6.0.1/dist/ionicons/ionicons.js"></script>
-<!--LoginStart--><script src="https://www.unpkg.com/js-sha1@0.6.0/src/sha1.js"></script><!--LoginEnd-->
+<!--LoginStart--><script src="?jsFile=sha1.min.js"></script><!--LoginEnd-->
 <!--customScript-->
 </html>
